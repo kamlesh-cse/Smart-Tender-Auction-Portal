@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Tenders | Company</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --sidebar-w:260px; --primary:#7c3aed; --green:#1cc88a; --red:#e74a3b; --dark:#1a1c23; --light:#f8f9fc; }
+        * { box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:var(--light); margin:0; }
+        #main { margin-left:var(--sidebar-w); min-height:100vh; }
+        .topbar { background:#fff; padding:0 30px; height:65px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 1px 0 #eee; }
+        .topbar h5 { font-weight:800; margin:0; color:var(--dark); }
+        .company-badge { background:linear-gradient(135deg,var(--primary),#5b21b6); color:#fff; padding:6px 14px; border-radius:20px; font-size:.8rem; font-weight:700; }
+        .page-body { padding:28px 30px; }
+        .filter-card, .data-card { background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.06); }
+        .filter-card { padding:16px; margin-bottom:18px; }
+        .form-control, .form-select { border:1.5px solid #e0e4ef; border-radius:8px; font-size:.88rem; }
+        .btn-primary { background:var(--primary); border-color:var(--primary); font-weight:700; }
+        .btn-new { background:var(--primary); color:#fff; border-radius:8px; padding:9px 16px; text-decoration:none; font-size:.85rem; font-weight:800; }
+        .table { margin:0; font-size:.85rem; }
+        thead th { background:var(--light); color:#777; font-size:.75rem; text-transform:uppercase; border:none; padding:12px 16px; }
+        tbody td { padding:12px 16px; vertical-align:middle; border-top:1px solid #f3f3f3; }
+        .badge-open { background:#d1f0e3; color:#0a5c38; padding:3px 10px; border-radius:20px; font-size:.75rem; font-weight:800; }
+        .badge-closed { background:#fde8e8; color:#7b1a1a; padding:3px 10px; border-radius:20px; font-size:.75rem; font-weight:800; }
+        .pager { display:flex; justify-content:flex-end; gap:8px; padding:14px 16px; }
+        .pager a, .pager span { padding:6px 11px; border-radius:7px; border:1px solid #e0e4ef; color:#555; text-decoration:none; font-size:.82rem; }
+        .pager .active { background:var(--primary); color:#fff; border-color:var(--primary); }
+    </style>
+</head>
+<body>
+<th:block th:replace="~{fragments/sidebar :: sidebarStyles}"></th:block>
+<th:block th:replace="~{fragments/sidebar :: sidebar('COMPANY','tenders')}"></th:block>
+
+<div id="main">
+    <div class="topbar">
+        <h5>My Tenders</h5>
+        <div class="company-badge" th:text="${companyName}">Company</div>
+    </div>
+
+    <div class="page-body">
+        <div th:if="${success}" class="alert alert-success mb-3" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger mb-3" th:text="${error}"></div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h6 style="font-weight:800;color:var(--dark);margin:0">Published by your company</h6>
+                <small class="text-muted" th:text="${tenderPage.totalElements} + ' tenders'">0 tenders</small>
+            </div>
+            <a th:href="@{/company/tender/create}" class="btn-new">Create Tender</a>
+        </div>
+
+        <form class="filter-card row g-2 align-items-end" method="get" th:action="@{/company/my-tenders}">
+            <div class="col-md-6">
+                <label class="form-label small fw-bold">Search</label>
+                <input class="form-control" type="text" name="search" th:value="${search}" placeholder="Title or category">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold">Status</label>
+                <select class="form-select" name="status">
+                    <option value="" th:selected="${status == null or status == ''}">All</option>
+                    <option value="OPEN" th:selected="${status == 'OPEN'}">OPEN</option>
+                    <option value="CLOSED" th:selected="${status == 'CLOSED'}">CLOSED</option>
+                    <option value="CANCELLED" th:selected="${status == 'CANCELLED'}">CANCELLED</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">Apply</button>
+            </div>
+        </form>
+
+        <div class="data-card">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Budget</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Status</th>
+                    <th>Winner</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="t, i : ${tenders}">
+                    <td th:text="${tenderPage.number * tenderPage.size + i.index + 1}">1</td>
+                    <td style="font-weight:700" th:text="${t.title}">Tender</td>
+                    <td th:text="${t.category}">Category</td>
+                    <td th:text="${t.estimatedBudget != null ? 'Rs ' + #numbers.formatDecimal(t.estimatedBudget, 1, 'COMMA', 0, 'POINT') : '-'}">-</td>
+                    <td th:text="${t.startDate}">-</td>
+                    <td th:text="${t.endDate}">-</td>
+                    <td>
+                        <span th:if="${t.status == 'OPEN'}" class="badge-open">OPEN</span>
+                        <span th:unless="${t.status == 'OPEN'}" class="badge-closed" th:text="${t.status}">CLOSED</span>
+                    </td>
+                    <td th:text="${t.winner != null ? t.winner.name : 'Pending'}">Pending</td>
+                    <td>
+                        <a th:href="@{'/company/tender/view/' + ${t.id}}" class="btn btn-sm btn-outline-primary">View</a>
+                        <a th:if="${!t.editLocked}" th:href="@{'/company/tender/edit/' + ${t.id}}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <form th:if="${!t.editLocked}" th:action="@{'/company/tender/delete/' + ${t.id}}" method="post" style="display:inline">
+                            <input type="hidden" name="_csrf" th:value="${_csrf}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                        <span th:if="${t.editLocked}" style="background:#e5e7eb;color:#4b5563;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700">Locked</span>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(tenders)}">
+                    <td colspan="9" class="text-center text-muted py-4">No tenders found.</td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="pager" th:if="${tenderPage.totalPages > 1}">
+                <a th:if="${tenderPage.hasPrevious()}" th:href="@{/company/my-tenders(search=${search},status=${status},page=${tenderPage.number - 1})}">Prev</a>
+                <span th:each="p : ${#numbers.sequence(0, tenderPage.totalPages - 1)}"
+                      th:classappend="${p == tenderPage.number} ? ' active'">
+                    <a th:if="${p != tenderPage.number}" th:href="@{/company/my-tenders(search=${search},status=${status},page=${p})}" th:text="${p + 1}">1</a>
+                    <span th:if="${p == tenderPage.number}" th:text="${p + 1}">1</span>
+                </span>
+                <a th:if="${tenderPage.hasNext()}" th:href="@{/company/my-tenders(search=${search},status=${status},page=${tenderPage.number + 1})}">Next</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

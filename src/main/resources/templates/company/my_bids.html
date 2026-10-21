@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bids & Proposals | Company</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-w: 240px;
+            --primary: #7c3aed;
+            --accent: #a78bfa;
+            --green: #1cc88a;
+            --yellow: #f6c23e;
+            --red: #e74a3b;
+            --dark: #1a1c23;
+            --light: #f8f9fc;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light);
+            margin: 0;
+        }
+
+        #sidebar {
+            width: var(--sidebar-w);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: var(--dark);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            padding: 22px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            text-align: center;
+        }
+
+        .sidebar-brand .logo {
+            font-size: 1.5rem;
+        }
+
+        .sidebar-brand h5 {
+            color: #fff;
+            font-weight: 800;
+            margin: 6px 0 2px;
+            font-size: 1rem;
+        }
+
+        .sidebar-brand small {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.75rem;
+        }
+
+        .nav-section {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+            color: rgba(255, 255, 255, 0.3);
+            padding: 18px 20px 6px;
+            font-weight: 600;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.65);
+            text-decoration: none;
+            padding: 11px 20px;
+            font-size: 0.87rem;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.06);
+            border-left-color: var(--accent);
+        }
+
+        .sidebar-link .icon {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .logout-btn {
+            display: block;
+            text-align: center;
+            background: rgba(231, 74, 59, 0.15);
+            color: #e74a3b;
+            border: 1px solid rgba(231, 74, 59, 0.3);
+            padding: 9px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            background: rgba(231, 74, 59, 0.25);
+            color: #e74a3b;
+        }
+
+        #main {
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            background: #fff;
+            padding: 0 30px;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 0 #eee;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .topbar h5 {
+            font-weight: 700;
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .clock-badge {
+            background: var(--light);
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .user-badge {
+            background: linear-gradient(135deg, var(--primary), #5b21b6);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .page-body {
+            padding: 28px 30px;
+            flex: 1;
+        }
+
+        .alert {
+            border-radius: 10px;
+            font-size: 0.87rem;
+            border: none;
+        }
+
+        .alert-success {
+            background: #d1f0e3;
+            color: #0a5c38;
+        }
+
+        .alert-danger {
+            background: #fde8e8;
+            color: #7b1a1a;
+        }
+
+        .section-title {
+            font-weight: 800;
+            color: var(--dark);
+            font-size: 1rem;
+            margin: 0 0 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title .count {
+            background: var(--primary);
+            color: #fff;
+            font-size: 0.72rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+
+        .data-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            margin-bottom: 32px;
+        }
+
+        .data-card .table {
+            margin: 0;
+            font-size: 0.85rem;
+        }
+
+        .data-card thead th {
+            background: var(--light);
+            color: #888;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            border: none;
+            padding: 12px 16px;
+        }
+
+        .data-card tbody td {
+            padding: 13px 16px;
+            vertical-align: middle;
+            border-top: 1px solid #f5f5f5;
+            color: #444;
+        }
+
+        .data-card tbody tr:hover {
+            background: #faf7ff;
+        }
+
+        .badge-live {
+            background: #d1f0e3;
+            color: #0a5c38;
+            padding: 4px 11px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-closed {
+            background: #fde8e8;
+            color: #7b1a1a;
+            padding: 4px 11px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-won {
+            background: #ede9fe;
+            color: #5b21b6;
+            padding: 4px 11px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .btn-tbl-view {
+            background: #ede9fe;
+            color: #5b21b6;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .btn-tbl-view:hover {
+            opacity: 0.85;
+            color: #5b21b6;
+        }
+
+        .search-bar {
+            background: #fff;
+            border: 1.5px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 0.88rem;
+            width: 220px;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .divider {
+            height: 2px;
+            background: var(--light);
+            border-radius: 2px;
+            margin: 8px 0 28px;
+        }
+    </style>
+</head>
+
+<body>
+    <th:block th:replace="~{fragments/sidebar :: sidebarStyles}"></th:block>
+    <th:block th:replace="~{fragments/sidebar :: sidebar('COMPANY','my-bids')}"></th:block>
+    <div id="main">
+        <div class="topbar">
+            <h5>💰 My Bids &amp; Proposals</h5>
+            <div style="display:flex;align-items:center;gap:14px">
+                <div class="clock-badge">🕐 <span id="clock"></span></div>
+                <div class="user-badge">🏢 <span th:text="${companyName}">Company</span></div>
+            </div>
+        </div>
+        <div class="page-body">
+            <div th:if="${success}" class="alert alert-success mb-3" th:text="${success}"></div>
+            <div th:if="${error}" class="alert alert-danger  mb-3" th:text="${error}"></div>
+
+            <!-- AUCTION BIDS -->
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+                <div class="section-title">
+                    🔨 My Auction Bids
+                    <span class="count" th:text="${#lists.size(auctionBids)}">0</span>
+                </div>
+                <input type="text" id="auctionSearch" class="search-bar" placeholder="🔍 Search auctions..."
+                    onkeyup="filterTable('auctionTable','auctionSearch')">
+            </div>
+            <div class="data-card">
+                <table class="table" id="auctionTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Auction</th>
+                            <th>My Bid</th>
+                            <th>Highest Bid</th>
+                            <th>Deadline</th>
+                            <th>Result</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="b, i : ${auctionBids}">
+                            <td class="text-muted" th:text="${i.index+1}">1</td>
+                            <td>
+                                <div style="font-weight:600;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+                                    th:text="${b.auction.title}">Title</div>
+                                <div style="font-size:0.75rem;color:#aaa"
+                                    th:text="${b.auction.createdBy != null ? b.auction.createdBy.name : 'Admin'}">By
+                                </div>
+                            </td>
+                            <td style="font-weight:700;color:var(--primary)"
+                                th:text="${b.bidAmount != null ? '₹'+#numbers.formatDecimal(b.bidAmount, 1, 'COMMA', 0, 'POINT') : '—'}">
+                                —</td>
+                            <td style="font-weight:600;color:var(--green)"
+                                th:text="${b.auction.currentHighestBid != null ? '₹'+#numbers.formatDecimal(b.auction.currentHighestBid, 1, 'COMMA', 0, 'POINT') : '—'}">
+                                —</td>
+                            <td style="font-size:0.8rem;color:#777" th:text="${b.auction.deadline}">—</td>
+                            <td>
+                                <span th:if="${b.auction.winner != null and b.auction.winner.id == companyUser.id}"
+                                    class="badge-won">🏆 Won</span>
+                                <span th:if="${b.auction.lifecycleStatus == 'LIVE'}" class="badge-live">⚡ Live</span>
+                                <span
+                                    th:if="${b.auction.status == 'CLOSED' and (b.auction.winner == null or b.auction.winner.id != companyUser.id)}"
+                                    class="badge-closed">❌ Lost</span>
+                            </td>
+                            <td><a th:href="@{'/company/auction/view/'+${b.auction.id}}" class="btn-tbl-view">View</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(auctionBids)}">
+                            <td colspan="7" class="text-center text-muted py-4">
+                                No auction bids yet. <a th:href="@{/company/auctions}"
+                                    style="color:var(--primary);font-weight:600">Browse auctions →</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- TENDER PROPOSALS -->
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+                <div class="section-title">
+                    📄 My Tender Proposals
+                    <span class="count" th:text="${#lists.size(tenderBids)}">0</span>
+                </div>
+                <input type="text" id="tenderSearch" class="search-bar" placeholder="🔍 Search tenders..."
+                    onkeyup="filterTable('tenderTable','tenderSearch')">
+            </div>
+            <div class="data-card">
+                <table class="table" id="tenderTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Tender</th>
+                            <th>Category</th>
+                            <th>My Bid</th>
+                            <th>Submitted</th>
+                            <th>Result</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="b, i : ${tenderBids}">
+                            <td class="text-muted" th:text="${i.index+1}">1</td>
+                            <td>
+                                <div style="font-weight:600;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+                                    th:text="${b.tender.title}">Title</div>
+                                <div style="font-size:0.75rem;color:#aaa"
+                                    th:text="${b.tender.createdBy != null ? b.tender.createdBy.name : 'Admin'}">By</div>
+                            </td>
+                            <td><span
+                                    style="background:#ede9fe;color:#5b21b6;padding:3px 9px;border-radius:20px;font-size:0.75rem;font-weight:600"
+                                    th:text="${b.tender.category}">Cat</span></td>
+                            <td style="font-weight:700;color:var(--primary)"
+                                th:text="${b.bidAmount != null ? '₹'+#numbers.formatDecimal(b.bidAmount, 1, 'COMMA', 0, 'POINT') : '—'}">
+                                —</td>
+                            <td style="font-size:0.8rem;color:#777"
+                                th:text="${#temporals.format(b.submittedAt,'dd MMM yyyy HH:mm')}">—</td>
+                            <td>
+                                <span th:if="${b.tender.winner != null and b.tender.winner.id == companyUser.id}"
+                                    class="badge-won">🏆 Won</span>
+                                <span th:if="${b.tender.status == 'OPEN'}" class="badge-live">📋 Open</span>
+                                <span
+                                    th:if="${b.tender.status == 'CLOSED' and (b.tender.winner == null or b.tender.winner.id != companyUser.id)}"
+                                    class="badge-closed">❌ Lost</span>
+                            </td>
+                            <td><a th:href="@{'/company/tender/view/'+${b.tender.id}}" class="btn-tbl-view">View</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(tenderBids)}">
+                            <td colspan="7" class="text-center text-muted py-4">
+                                No proposals yet. <a th:href="@{/company/tenders}"
+                                    style="color:var(--primary);font-weight:600">Browse tenders →</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateClock() { document.getElementById('clock').textContent = new Date().toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }); }
+        updateClock(); setInterval(updateClock, 1000);
+        function filterTable(tableId, inputId) { const q = document.getElementById(inputId).value.toLowerCase(); document.querySelectorAll('#' + tableId + ' tbody tr').forEach(r => { r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none'; }); }
+    </script>
+
+<link rel="stylesheet" th:href="@{/css/chatbot.css}">
+<script th:src="@{/js/chatbot.js}"></script>
+</body>
+
+</html>

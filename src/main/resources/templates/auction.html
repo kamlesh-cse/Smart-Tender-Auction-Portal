@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Auctions | Smart Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --dark: #1a1c23;
+            --light-bg: #f8f9fc;
+            --gold: #f6c23e;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-bg);
+        }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            background: var(--dark);
+            padding: 0 40px;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .navbar .brand {
+            color: #fff;
+            font-size: 1.25rem;
+            font-weight: 800;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .navbar .nav-links a {
+            color: rgba(255, 255, 255, 0.75);
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .navbar .nav-links a:hover,
+        .navbar .nav-links a.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-login-nav {
+            background: transparent;
+            border: 1.5px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 18px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-login-nav:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .btn-signup-nav {
+            background: var(--primary);
+            border: none;
+            color: #fff;
+            padding: 7px 18px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .btn-signup-nav:hover {
+            opacity: 0.85;
+            color: #fff;
+        }
+
+        /* ── LIVE CLOCK ── */
+        .live-clock-bar {
+            background: var(--primary);
+            color: #fff;
+            text-align: center;
+            padding: 7px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.02rem;
+        }
+
+        #liveClock {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        /* ── Hero Banner ── */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, #224abe 100%);
+            color: #fff;
+            padding: 60px 30px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            font-size: 1rem;
+            opacity: 0.85;
+            margin: 0;
+        }
+
+        /* ── Cards ── */
+        .auction-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
+        }
+
+        .auction-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+        }
+
+        .auction-card .card-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .auction-card .card-img-placeholder {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #e8ecf4, #d0d8ec);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+            font-size: 2.5rem;
+        }
+
+        .auction-card .card-body {
+            padding: 18px;
+        }
+
+        .auction-card .card-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 6px;
+            color: #1a1c23;
+        }
+
+        .auction-card .card-desc {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 14px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82rem;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .badge-duration {
+            display: inline-block;
+            background: #e8edff;
+            color: var(--primary);
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-top: 8px;
+        }
+
+        /* ── Empty State ── */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #aaa;
+        }
+
+        .empty-state .icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            background: var(--dark);
+            color: rgba(255, 255, 255, 0.5);
+            padding: 50px 0 24px;
+            margin-top: 60px;
+        }
+
+        .footer-brand {
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .footer-desc {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.45);
+            line-height: 1.6;
+            max-width: 280px;
+        }
+
+        .footer-links h6 {
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+        }
+
+        .footer-links a {
+            display: block;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: #fff;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            margin-top: 40px;
+            padding-top: 20px;
+            text-align: center;
+            font-size: 0.82rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ── LIVE CLOCK BAR ── -->
+    <div class="live-clock-bar">
+        🕐 Live: <span id="liveClock"></span>
+    </div>
+
+    <!-- ── NAVBAR ── -->
+    <nav class="navbar">
+        <a href="/" class="brand">🏛️ SmartPortal</a>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a th:href="@{/auctions}" class="active">Auctions</a>
+            <a th:href="@{/tenders}">Tenders</a>
+            <a th:href="@{/about}">About</a>
+            <a th:href="@{/contact}">Contact</a>
+        </div>
+        <div class="nav-right">
+            <a th:href="@{/login}" class="btn-login-nav">Login</a>
+            <a th:href="@{/signup}" class="btn-signup-nav">Sign Up</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <div class="hero">
+        <h1>🔨 Live Auctions</h1>
+        <p>Browse all active auctions updated in real-time by our team</p>
+    </div>
+
+    <!-- Content -->
+    <div class="container py-5">
+
+        <!-- Stats bar -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <span class="text-muted small">
+                Showing <strong th:text="${#lists.size(auctions)}">0</strong> auction(s)
+            </span>
+            <span class="badge bg-success px-3 py-2">● Live</span>
+        </div>
+
+        <!-- Empty state -->
+        <div th:if="${#lists.isEmpty(auctions)}" class="empty-state">
+            <div class="icon">📭</div>
+            <h5>No auctions available right now</h5>
+            <p>Check back later for upcoming auctions.</p>
+        </div>
+
+        <!-- Auction Cards Grid -->
+        <div th:unless="${#lists.isEmpty(auctions)}" class="row g-4">
+            <div class="col-sm-6 col-lg-4 col-xl-3" th:each="a : ${auctions}">
+                <div class="auction-card">
+
+                    <!-- Photo -->
+                    <img th:if="${a.photo != null and !#strings.isEmpty(a.photo)}" th:src="@{'/uploads/' + ${a.photo}}"
+                        class="card-img" alt="Auction Image">
+                    <div th:unless="${a.photo != null and !#strings.isEmpty(a.photo)}" class="card-img-placeholder">🖼️
+                    </div>
+
+                    <div class="card-body">
+                        <div class="card-title" th:text="${a.title}">Title</div>
+                        <div class="card-desc" th:text="${a.description}">Description</div>
+
+                        <div class="info-row">
+                            📅 <span th:text="${a.auctionDate}">Date</span>
+                        </div>
+                        <div class="info-row">
+                            🕐 <span th:text="${a.auctionTime}">Time</span>
+                        </div>
+                        <div>
+                            <span class="badge-duration">⏱ <span
+                                    th:text="${a.durationMinutes} + ' minutes'">Duration</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <nav class="d-flex justify-content-center gap-3 mt-4" th:if="${page.totalPages > 1}">
+            <a class="btn btn-outline-primary" th:if="${page.hasPrevious()}"
+               th:href="@{/auctions(page=${page.number - 1},size=${page.size})}">Previous</a>
+            <span class="align-self-center"
+                  th:text="'Page ' + ${page.number + 1} + ' of ' + ${page.totalPages}">Page</span>
+            <a class="btn btn-outline-primary" th:if="${page.hasNext()}"
+               th:href="@{/auctions(page=${page.number + 1},size=${page.size})}">Next</a>
+        </nav>
+    </div>
+
+    <!-- ── FOOTER ── -->
+    <footer>
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="footer-brand">🏛️ SmartPortal</div>
+                    <p class="footer-desc">India's automated tender and auction management platform. Transparent, fast,
+                        and fair.</p>
+                </div>
+                <div class="col-md-2 col-6 footer-links">
+                    <h6>Platform</h6>
+                    <a th:href="@{/auctions}">Auctions</a>
+                    <a th:href="@{/tenders}">Tenders</a>
+                    <a th:href="@{/about}">About Us</a>
+                    <a th:href="@{/contact}">Contact</a>
+                </div>
+                <div class="col-md-2 col-6 footer-links">
+                    <h6>Account</h6>
+                    <a th:href="@{/login}">Login</a>
+                    <a th:href="@{/signup}">Sign Up</a>
+                </div>
+                <div class="col-md-4 footer-links">
+                    <h6>Contact</h6>
+                    <a href="#">📧 support@smartportal.in</a>
+                    <a href="#">📞 +91 98765 43210</a>
+                    <a href="#">📍 New Delhi, India</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2025 SmartPortal. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const options = {
+                weekday: 'short', year: 'numeric', month: 'short',
+                day: '2-digit', hour: '2-digit', minute: '2-digit',
+                second: '2-digit', hour12: true
+            };
+            document.getElementById('liveClock').textContent =
+                now.toLocaleString('en-IN', options);
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
+
+<link rel="stylesheet" th:href="@{/css/chatbot.css}">
+<script th:src="@{/js/chatbot.js}"></script>
+</body>
+
+</html>

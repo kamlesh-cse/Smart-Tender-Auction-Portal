@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Tender | Government</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-w: 260px;
+            --primary: #2d6a4f;
+            --green: #1cc88a;
+            --yellow: #f6c23e;
+            --red: #e74a3b;
+            --dark: #1a1c23;
+            --light: #f8f9fc;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light);
+            margin: 0;
+        }
+
+        #sidebar {
+            width: var(--sidebar-w);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: var(--dark);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            padding: 22px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            text-align: center;
+        }
+
+        .sidebar-brand .logo {
+            font-size: 1.5rem;
+        }
+
+        .sidebar-brand h5 {
+            color: #fff;
+            font-weight: 800;
+            margin: 6px 0 2px;
+            font-size: 1rem;
+        }
+
+        .sidebar-brand small {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.75rem;
+        }
+
+        .nav-section {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+            color: rgba(255, 255, 255, 0.3);
+            padding: 18px 20px 6px;
+            font-weight: 600;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.65);
+            text-decoration: none;
+            padding: 11px 20px;
+            font-size: 0.87rem;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.06);
+            border-left-color: var(--primary);
+        }
+
+        .sidebar-link .icon {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .logout-btn {
+            display: block;
+            text-align: center;
+            background: rgba(231, 74, 59, 0.15);
+            color: #e74a3b;
+            border: 1px solid rgba(231, 74, 59, 0.3);
+            padding: 9px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            background: rgba(231, 74, 59, 0.25);
+            color: #e74a3b;
+        }
+
+        #main {
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            background: #fff;
+            padding: 0 30px;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 0 #eee;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .topbar h5 {
+            font-weight: 700;
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .clock-badge {
+            background: var(--light);
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .gov-badge {
+            background: linear-gradient(135deg, var(--primary), #1b4332);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .page-body {
+            padding: 28px 30px;
+            flex: 1;
+        }
+
+        .data-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .data-card .table {
+            margin: 0;
+            font-size: 0.85rem;
+        }
+
+        .data-card thead th {
+            background: var(--light);
+            color: #888;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+            font-weight: 700;
+            border: none;
+            padding: 12px 16px;
+        }
+
+        .data-card tbody td {
+            padding: 12px 16px;
+            vertical-align: middle;
+            border-top: 1px solid #f5f5f5;
+            color: #444;
+        }
+
+        .badge-open {
+            background: #d1f0e3;
+            color: #0a5c38;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .badge-closed {
+            background: #fde8e8;
+            color: #7b1a1a;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .cat-badge {
+            background: #e8f5e9;
+            color: #1b4332;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .meta-box {
+            background: var(--light);
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .meta-box .meta-label {
+            font-size: 0.72rem;
+            color: #aaa;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+            margin-bottom: 4px;
+        }
+
+        .meta-box .meta-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .btn-back {
+            background: var(--light);
+            border: 1.5px solid #e0e4ef;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-weight: 600;
+            color: #666;
+            font-size: 0.87rem;
+            text-decoration: none;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, var(--yellow), #e0a800);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-weight: 700;
+            color: #1a1c23;
+            font-size: 0.87rem;
+            text-decoration: none;
+        }
+
+        .winner-box {
+            background: linear-gradient(135deg, #d1f0e3, #b8e8d4);
+            border-radius: 12px;
+            padding: 20px 24px;
+            border: 1px solid #a8d8c8;
+        }
+
+        .section-title {
+            font-weight: 800;
+            color: var(--dark);
+            font-size: 0.95rem;
+            margin-bottom: 14px;
+        }
+
+        .rank-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
+        .rank-1 {
+            background: #f6c23e;
+            color: #1a1c23;
+        }
+
+        .rank-other {
+            background: #eee;
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+    <th:block th:replace="~{fragments/sidebar :: sidebarStyles}"></th:block>
+    <th:block th:replace="~{fragments/sidebar :: sidebar('GOVERNMENT','tenders')}"></th:block>
+
+    <div id="main">
+        <div class="topbar">
+            <h5>🔍 Tender Details</h5>
+            <div style="display:flex;align-items:center;gap:14px">
+                <div class="clock-badge">🕐 <span id="clock"></span></div>
+                <div class="gov-badge">🏛️ <span th:text="${govName}">Authority</span></div>
+            </div>
+        </div>
+
+        <div class="page-body">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+                <a th:href="@{/government/tenders}" class="btn-back">← Back to Tenders</a>
+                <a th:href="@{'/government/tender/edit/' + ${tender.id}}" class="btn-edit">✏️ Edit Tender</a>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-7">
+                    <div class="data-card p-4">
+                        <div
+                            style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px">
+                            <div>
+                                <h4 style="font-weight:800;color:var(--dark);margin-bottom:8px"
+                                    th:text="${tender.title}">Title</h4>
+                                <span th:if="${tender.status == 'OPEN'}" class="badge-open me-2">🟢 OPEN</span>
+                                <span th:unless="${tender.status == 'OPEN'}" class="badge-closed me-2">🔴 CLOSED</span>
+                                <span class="cat-badge" th:text="${tender.category}">Cat</span>
+                            </div>
+                        </div>
+
+                        <p style="color:#666;line-height:1.8;font-size:0.92rem;margin-bottom:22px"
+                            th:text="${tender.description}">—</p>
+
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="meta-box">
+                                    <div class="meta-label">Start Date</div>
+                                    <div class="meta-value" th:text="${tender.startDate}">—</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="meta-box">
+                                    <div class="meta-label">End Date</div>
+                                    <div class="meta-value" th:text="${tender.endDate}">—</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="meta-box">
+                                    <div class="meta-label">Estimated Budget</div>
+                                    <div class="meta-value" style="color:var(--primary)"
+                                        th:text="${tender.estimatedBudget != null ? '₹' + #numbers.formatDecimal(tender.estimatedBudget, 1, 'COMMA', 0, 'POINT') : 'Not set'}">
+                                        —</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="meta-box">
+                                    <div class="meta-label">Winning Bid</div>
+                                    <div class="meta-value" style="color:var(--green)"
+                                        th:text="${tender.winningBid != null ? '₹' + #numbers.formatDecimal(tender.winningBid, 1, 'COMMA', 0, 'POINT') : 'Pending'}">
+                                        —</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="meta-box">
+                                    <div class="meta-label">Department</div>
+                                    <div class="meta-value" th:text="${govName}">Authority</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="meta-box">
+                                    <div class="meta-label">Total Proposals</div>
+                                    <div class="meta-value" th:text="${#lists.size(bids)} + ' submitted'">—</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div th:if="${tender.winner != null}" class="winner-box mt-3">
+                            <div style="font-size:1.1rem;font-weight:800;color:#0a5c38">🏆 Winner: <span
+                                    th:text="${tender.winner.name}">Name</span></div>
+                            <div style="font-size:0.88rem;color:#0a5c38;margin-top:4px"
+                                th:text="'Organisation: ' + ${tender.winner.organisation}">—</div>
+                            <div style="font-size:0.88rem;color:#0a5c38;margin-top:2px"
+                                th:text="${'Winning Bid: ₹' + #numbers.formatDecimal(tender.winningBid, 1, 'COMMA', 0, 'POINT')}">
+                                —</div>
+                        </div>
+
+                        <div th:if="${tender.status == 'OPEN'}"
+                            style="margin-top:20px;text-align:center;background:#e8f5e9;border-radius:10px;padding:16px;border:1px solid #b8e0d4">
+                            <div style="font-size:0.8rem;color:#888;margin-bottom:6px">📅 Days Remaining</div>
+                            <div style="font-size:1.6rem;font-weight:800;color:var(--primary)" id="daysLeft">...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-5">
+                    <div class="section-title">📄 Company Proposals <span
+                            style="font-size:0.82rem;color:#aaa;font-weight:500"
+                            th:text="'(' + ${#lists.size(bids)} + ' total)'"></span></div>
+                    <div class="data-card">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Company</th>
+                                    <th>Bid Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="b, i : ${bids}">
+                                    <td><span
+                                            th:classappend="${i.index == 0} ? 'rank-badge rank-1' : 'rank-badge rank-other'"
+                                            th:text="${i.index + 1}">1</span></td>
+                                    <td>
+                                        <div style="font-weight:600;font-size:0.85rem" th:text="${b.company.name}">Name
+                                        </div>
+                                        <div style="font-size:0.75rem;color:#aaa" th:text="${b.company.organisation}">
+                                            Org</div>
+                                    </td>
+                                    <td><span style="font-weight:800;color:var(--green)"
+                                            th:text="${'₹' + #numbers.formatDecimal(b.bidAmount, 1, 'COMMA', 0, 'POINT')}">—</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        function updateClock() { document.getElementById('clock').textContent = new Date().toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }); }
+        updateClock(); setInterval(updateClock, 1000);
+        const endDateStr = /*[[${tender.endDate}]]*/ null;
+        const daysEl = document.getElementById('daysLeft');
+        if (endDateStr && daysEl) {
+            const end = new Date(endDateStr);
+            const diff = Math.ceil((end - new Date()) / (1000 * 60 * 60 * 24));
+            daysEl.textContent = diff <= 0 ? 'Deadline Passed' : diff + ' days remaining';
+            if (diff <= 0) daysEl.style.color = 'var(--red)';
+        }
+    </script>
+
+<link rel="stylesheet" th:href="@{/css/chatbot.css}">
+<script th:src="@{/js/chatbot.js}"></script>
+</body>
+
+</html>

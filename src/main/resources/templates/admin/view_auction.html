@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Auction | Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-w: 260px;
+            --primary: #4e73df;
+            --green: #1cc88a;
+            --yellow: #f6c23e;
+            --red: #e74a3b;
+            --dark: #1a1c23;
+            --light: #f8f9fc;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light);
+            margin: 0;
+        }
+
+        #sidebar {
+            width: var(--sidebar-w);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: var(--dark);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            padding: 22px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            text-align: center;
+        }
+
+        .sidebar-brand .logo {
+            font-size: 1.5rem;
+        }
+
+        .sidebar-brand h5 {
+            color: #fff;
+            font-weight: 800;
+            margin: 6px 0 2px;
+            font-size: 1rem;
+        }
+
+        .sidebar-brand small {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.75rem;
+        }
+
+        .nav-section {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+            color: rgba(255, 255, 255, 0.3);
+            padding: 18px 20px 6px;
+            font-weight: 600;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.65);
+            text-decoration: none;
+            padding: 11px 20px;
+            font-size: 0.87rem;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.06);
+            border-left-color: var(--primary);
+        }
+
+        .sidebar-link .icon {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .logout-btn {
+            display: block;
+            text-align: center;
+            background: rgba(231, 74, 59, 0.15);
+            color: #e74a3b;
+            border: 1px solid rgba(231, 74, 59, 0.3);
+            padding: 9px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            background: rgba(231, 74, 59, 0.25);
+            color: #e74a3b;
+        }
+
+        #main {
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            background: #fff;
+            padding: 0 30px;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 0 #eee;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .topbar h5 {
+            font-weight: 700;
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .clock-badge {
+            background: var(--light);
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .admin-badge {
+            background: linear-gradient(135deg, var(--primary), #224abe);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .page-body {
+            padding: 28px 30px;
+            flex: 1;
+        }
+
+        .data-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .data-card .table {
+            margin: 0;
+            font-size: 0.85rem;
+        }
+
+        .data-card thead th {
+            background: var(--light);
+            color: #888;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+            font-weight: 700;
+            border: none;
+            padding: 12px 16px;
+        }
+
+        .data-card tbody td {
+            padding: 12px 16px;
+            vertical-align: middle;
+            border-top: 1px solid #f5f5f5;
+            color: #444;
+        }
+
+        .data-card tbody tr:hover {
+            background: #fafbff;
+        }
+
+        .badge-open {
+            background: #d1f0e3;
+            color: #0a5c38;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .badge-closed {
+            background: #fde8e8;
+            color: #7b1a1a;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .meta-box {
+            background: var(--light);
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .meta-box .meta-label {
+            font-size: 0.72rem;
+            color: #aaa;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+            margin-bottom: 4px;
+        }
+
+        .meta-box .meta-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .btn-back {
+            background: var(--light);
+            border: 1.5px solid #e0e4ef;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-weight: 600;
+            color: #666;
+            font-size: 0.87rem;
+            text-decoration: none;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, var(--yellow), #e0a800);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-weight: 700;
+            color: #1a1c23;
+            font-size: 0.87rem;
+            text-decoration: none;
+        }
+
+        .winner-box {
+            background: linear-gradient(135deg, #d1f0e3, #b8e8d4);
+            border-radius: 12px;
+            padding: 20px 24px;
+            border: 1px solid #a8d8c8;
+        }
+
+        .countdown-big {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .countdown-big.urgent {
+            color: var(--red);
+        }
+
+        .section-title {
+            font-weight: 800;
+            color: var(--dark);
+            font-size: 0.95rem;
+            margin-bottom: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <th:block th:replace="~{fragments/sidebar :: sidebarStyles}"></th:block>
+    <th:block th:replace="~{fragments/sidebar :: sidebar('ADMIN','auctions')}"></th:block>
+
+    <div id="main">
+        <div class="topbar">
+            <h5>🔍 Auction Details</h5>
+            <div style="display:flex;align-items:center;gap:14px">
+                <div class="clock-badge">🕐 <span id="clock"></span></div>
+                <div class="admin-badge">👑 <span th:text="${adminName}">Admin</span></div>
+            </div>
+        </div>
+
+        <div class="page-body">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+                <a th:href="@{/admin/auctions}" class="btn-back">← Back to Auctions</a>
+                <a th:href="@{'/admin/auction/edit/' + ${auction.id}}" class="btn-edit">✏️ Edit Auction</a>
+            </div>
+
+            <div class="row g-4">
+                <!-- Left: Auction Details -->
+                <div class="col-lg-7">
+                    <div class="data-card p-4">
+                        <!-- Header -->
+                        <div
+                            style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px">
+                            <div>
+                                <h4 style="font-weight:800;color:var(--dark);margin-bottom:8px"
+                                    th:text="${auction.title}">Title</h4>
+                                <span th:if="${auction.lifecycleStatus == 'LIVE'}" class="badge-open">LIVE</span>
+                                <span th:unless="${auction.lifecycleStatus == 'LIVE'}" th:style="${auction.lifecycleStatus == 'UPCOMING' ? 'background:#fff3d4;color:#7d6608;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700' : 'background:#e5e7eb;color:#4b5563;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700'}" th:text="${auction.lifecycleStatus}">CLOSED</span>
+                            </div>
+                        </div>
+
+                        <!-- Image -->
+                        <img th:if="${auction.photo != null and !#strings.isEmpty(auction.photo)}"
+                            th:src="@{'/uploads/' + ${auction.photo}}"
+                            style="width:100%;max-height:260px;object-fit:cover;border-radius:10px;margin-bottom:18px">
+
+                        <!-- Description -->
+                        <p style="color:#666;line-height:1.8;font-size:0.92rem;margin-bottom:22px"
+                            th:text="${auction.description}">—</p>
+
+                        <!-- Meta Grid -->
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="meta-box">
+                                    <div class="meta-label">Start</div>
+                                    <div class="meta-value"
+                                        th:text="${auction.auctionDate} + ' at ' + ${auction.auctionTime}">—</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="meta-box">
+                                    <div class="meta-label">Deadline</div>
+                                    <div class="meta-value" th:text="${auction.deadline}">—</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="meta-box">
+                                    <div class="meta-label">Duration</div>
+                                    <div class="meta-value" th:text="${auction.durationMinutes} + ' minutes'">—</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="meta-box">
+                                    <div class="meta-label">Starting Price</div>
+                                    <div class="meta-value" style="color:var(--primary)"
+                                        th:text="${auction.startingPrice != null ? '₹' + #numbers.formatDecimal(auction.startingPrice, 1, 'COMMA', 0, 'POINT') : '—'}">
+                                        —</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="meta-box">
+                                    <div class="meta-label">Highest Bid</div>
+                                    <div class="meta-value" style="color:var(--green)"
+                                        th:text="${auction.currentHighestBid > 0 ? '₹' + #numbers.formatDecimal(auction.currentHighestBid, 1, 'COMMA', 0, 'POINT') : 'No bids yet'}">
+                                        —</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="meta-box">
+                                    <div class="meta-label">Created By</div>
+                                    <div class="meta-value"
+                                        th:text="${auction.createdBy != null ? auction.createdBy.name : 'Admin'}">—
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Countdown -->
+                        <div th:if="${auction.lifecycleStatus == 'LIVE'}"
+                            style="margin-top:20px;text-align:center;background:#e8edff;border-radius:10px;padding:16px">
+                            <div style="font-size:0.8rem;color:#888;margin-bottom:6px">⏱ Time Remaining</div>
+                            <div class="countdown-big" id="countdown">Calculating...</div>
+                        </div>
+
+                        <!-- Winner Box -->
+                        <div th:if="${auction.winner != null}" class="winner-box mt-3">
+                            <div style="font-size:1.1rem;font-weight:800;color:#0a5c38">
+                                🏆 Winner: <span th:text="${auction.winner.name}">Name</span>
+                            </div>
+                            <div style="font-size:0.88rem;color:#0a5c38;margin-top:6px">
+                                Email: <span th:text="${auction.winner.email}">email</span>
+                            </div>
+                            <div style="font-size:0.88rem;color:#0a5c38;margin-top:2px"
+                                th:text="${'Winning Bid: ₹' + #numbers.formatDecimal(auction.currentHighestBid, 1, 'COMMA', 0, 'POINT')}">
+                                —</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Bids -->
+                <div class="col-lg-5">
+                    <div class="section-title">
+                        💰 All Bids
+                        <span style="font-size:0.82rem;color:#aaa;font-weight:500"
+                            th:text="'(' + ${#lists.size(bids)} + ' total)'"></span>
+                    </div>
+                    <div class="data-card">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Bidder</th>
+                                    <th>Amount</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="b, i : ${bids}">
+                                    <td class="text-muted" th:text="${i.index + 1}">1</td>
+                                    <td>
+                                        <div style="font-weight:600;font-size:0.85rem" th:text="${b.bidder.name}">Name
+                                        </div>
+                                        <div style="font-size:0.75rem;color:#aaa" th:text="${b.bidder.email}">email
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span style="font-weight:700;color:var(--green)"
+                                            th:text="${'₹' + #numbers.formatDecimal(b.bidAmount, 1, 'COMMA', 0, 'POINT')}">—</span>
+                                        <span th:if="${i.index == 0}"
+                                            style="background:#d1f0e3;color:#0a5c38;font-size:0.7rem;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:4px">
+                                            TOP
+                                        </span>
+                                    </td>
+                                    <td style="font-size:0.75rem;color:#aaa" th:text="${b.bidTime}">—</td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(bids)}">
+                                    <td colspan="4" class="text-center text-muted py-4">
+                                        No bids placed yet.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        function updateClock() {
+            document.getElementById('clock').textContent =
+                new Date().toLocaleString('en-IN', {
+                    day: '2-digit', month: 'short', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
+                });
+        }
+        updateClock(); setInterval(updateClock, 1000);
+
+        // Countdown
+        const deadlineStr = /*[[${auction.deadline}]]*/ null;
+        if (deadlineStr) {
+            const deadline = new Date(deadlineStr);
+            const cdEl = document.getElementById('countdown');
+            function tick() {
+                if (!cdEl) return;
+                const diff = deadline - new Date();
+                if (diff <= 0) {
+                    cdEl.textContent = 'Auction Ended';
+                    cdEl.classList.add('urgent');
+                    return;
+                }
+                const h = Math.floor(diff / 3600000);
+                const m = Math.floor((diff % 3600000) / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                cdEl.textContent = h + 'h ' + m + 'm ' + s + 's';
+                if (h < 1) cdEl.classList.add('urgent');
+            }
+            tick(); setInterval(tick, 1000);
+        }
+    </script>
+
+<link rel="stylesheet" th:href="@{/css/chatbot.css}">
+<script th:src="@{/js/chatbot.js}"></script>
+</body>
+
+</html>

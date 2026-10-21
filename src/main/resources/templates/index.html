@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Portal | Tender & Auction Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --green:   #1cc88a;
+            --dark:    #1a1c23;
+            --light:   #f8f9fc;
+            --gold:    #f6c23e;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--light); color: #333; }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            background: var(--dark);
+            padding: 0 40px;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+        .navbar .brand {
+            color: #fff;
+            font-size: 1.25rem;
+            font-weight: 800;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .navbar .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .navbar .nav-links a {
+            color: rgba(255,255,255,0.75);
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .navbar .nav-links a:hover,
+        .navbar .nav-links a.active {
+            color: #fff;
+            background: rgba(255,255,255,0.1);
+        }
+        .navbar .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-login-nav {
+            background: transparent;
+            border: 1.5px solid rgba(255,255,255,0.35);
+            color: #fff;
+            padding: 7px 18px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-login-nav:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        .btn-signup-nav {
+            background: var(--primary);
+            border: none;
+            color: #fff;
+            padding: 7px 18px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        .btn-signup-nav:hover { opacity: 0.85; color: #fff; }
+
+        /* ── LIVE CLOCK ── */
+        .live-clock-bar {
+            background: var(--primary);
+            color: #fff;
+            text-align: center;
+            padding: 7px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.02rem;
+        }
+        #liveClock { font-weight: 700; font-size: 0.95rem; }
+
+        /* ── HERO ── */
+        .hero {
+            background: linear-gradient(135deg, #1a1c23 0%, #2d3561 60%, #4e73df 100%);
+            min-height: 88vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(78,115,223,0.15) 0%, transparent 70%);
+            top: -100px; right: -100px;
+            border-radius: 50%;
+        }
+        .hero-content { position: relative; z-index: 1; max-width: 800px; }
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.9);
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            letter-spacing: 0.05rem;
+        }
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.15;
+            margin-bottom: 20px;
+        }
+        .hero h1 span { color: var(--gold); }
+        .hero p {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.75);
+            max-width: 580px;
+            margin: 0 auto 36px;
+            line-height: 1.7;
+        }
+        .hero-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+        .btn-hero-primary {
+            background: var(--primary);
+            color: #fff;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: 2px solid var(--primary);
+        }
+        .btn-hero-primary:hover {
+            background: transparent;
+            color: #fff;
+        }
+        .btn-hero-outline {
+            background: transparent;
+            color: #fff;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-decoration: none;
+            border: 2px solid rgba(255,255,255,0.4);
+            transition: all 0.2s;
+        }
+        .btn-hero-outline:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        /* ── STATS ── */
+        .stats-bar {
+            background: #fff;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 30px 0;
+        }
+        .stat-item { text-align: center; padding: 10px; }
+        .stat-item .number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: block;
+        }
+        .stat-item .label {
+            font-size: 0.85rem;
+            color: #888;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        /* ── SECTION TITLES ── */
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .section-title .badge-tag {
+            display: inline-block;
+            background: #e8edff;
+            color: var(--primary);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.06rem;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .section-title h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 12px;
+        }
+        .section-title p {
+            color: #888;
+            font-size: 0.95rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* ── HOW IT WORKS ── */
+        .how-section { padding: 90px 0; background: var(--light); }
+        .step-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px 24px;
+            text-align: center;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
+        }
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .step-icon {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem;
+            margin: 0 auto 18px;
+        }
+        .step-card h5 {
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+        .step-card p { font-size: 0.87rem; color: #888; line-height: 1.6; }
+
+        /* ── ROLES SECTION ── */
+        .roles-section { padding: 90px 0; background: var(--dark); }
+        .role-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 28px 22px;
+            text-align: center;
+            transition: all 0.2s;
+            height: 100%;
+        }
+        .role-card:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-4px);
+        }
+        .role-card .role-icon { font-size: 2.5rem; margin-bottom: 14px; }
+        .role-card h5 { color: #fff; font-weight: 700; margin-bottom: 10px; }
+        .role-card p { font-size: 0.83rem; color: rgba(255,255,255,0.6); line-height: 1.6; }
+        .role-card .role-badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-top: 14px;
+        }
+
+        /* ── FEATURED AUCTIONS / TENDERS PREVIEW ── */
+        .preview-section { padding: 90px 0; background: #fff; }
+        .preview-card {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
+            background: #fff;
+            border: 1px solid #f0f0f0;
+        }
+        .preview-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.1);
+        }
+        .preview-card .card-top {
+            background: linear-gradient(135deg, var(--primary), #224abe);
+            padding: 24px;
+            color: #fff;
+        }
+        .preview-card .card-top.green {
+            background: linear-gradient(135deg, var(--green), #13a06e);
+        }
+        .preview-card .card-body-inner { padding: 20px; }
+        .preview-card h5 { font-weight: 700; margin-bottom: 6px; }
+        .preview-card p { font-size: 0.85rem; color: rgba(255,255,255,0.8); }
+        .preview-card .inner-title {
+            font-weight: 700; font-size: 0.95rem;
+            color: var(--dark); margin-bottom: 6px;
+        }
+        .preview-card .inner-meta {
+            font-size: 0.82rem; color: #888; margin-bottom: 4px;
+        }
+
+        /* ── CTA ── */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary), #224abe);
+            padding: 90px 20px;
+            text-align: center;
+            color: #fff;
+        }
+        .cta-section h2 { font-size: 2.2rem; font-weight: 800; margin-bottom: 14px; }
+        .cta-section p { font-size: 1rem; opacity: 0.85; margin-bottom: 32px; max-width: 500px; margin-left: auto; margin-right: auto; }
+        .btn-cta {
+            background: #fff;
+            color: var(--primary);
+            padding: 14px 36px;
+            border-radius: 8px;
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        .btn-cta:hover { background: var(--gold); color: var(--dark); }
+
+        /* ── FOOTER ── */
+        footer {
+            background: var(--dark);
+            color: rgba(255,255,255,0.5);
+            padding: 50px 0 24px;
+        }
+        .footer-brand {
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        .footer-desc {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.45);
+            line-height: 1.6;
+            max-width: 280px;
+        }
+        .footer-links h6 {
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+        }
+        .footer-links a {
+            display: block;
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            transition: color 0.2s;
+        }
+        .footer-links a:hover { color: #fff; }
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.08);
+            margin-top: 40px;
+            padding-top: 20px;
+            text-align: center;
+            font-size: 0.82rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── LIVE CLOCK BAR ── -->
+<div class="live-clock-bar">
+    🕐 Live: <span id="liveClock"></span>
+</div>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar">
+    <a href="/" class="brand">🏛️ SmartPortal</a>
+    <div class="nav-links">
+        <a href="/" class="active">Home</a>
+        <a th:href="@{/auctions}">Auctions</a>
+        <a th:href="@{/tenders}">Tenders</a>
+        <a th:href="@{/about}">About</a>
+        <a th:href="@{/contact}">Contact</a>
+    </div>
+    <div class="nav-right">
+        <a th:href="@{/login}"  class="btn-login-nav">Login</a>
+        <a th:href="@{/signup}" class="btn-signup-nav">Sign Up</a>
+    </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-badge">🚀 India's Smart Tender & Auction Platform</div>
+        <h1>Transparent <span>Tenders</span> &<br>Live <span>Auctions</span> — All in One</h1>
+        <p>A fully automated, role-based platform for Government, Companies, and Users.
+           Bid, win, and manage — all in real time.</p>
+        <div class="hero-buttons">
+            <a th:href="@{/auctions}" class="btn-hero-primary">🔨 View Auctions</a>
+            <a th:href="@{/tenders}"  class="btn-hero-outline">📋 View Tenders</a>
+        </div>
+    </div>
+</section>
+
+<!-- ── STATS BAR ── -->
+<section class="stats-bar">
+    <div class="container">
+        <div class="row g-3">
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <span class="number" th:text="${totalAuctions   != null ? totalAuctions   : '0'}">0</span>
+                    <span class="label">Total Auctions</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <span class="number" th:text="${openAuctions    != null ? openAuctions    : '0'}">0</span>
+                    <span class="label">Live Auctions</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <span class="number" th:text="${totalTenders    != null ? totalTenders    : '0'}">0</span>
+                    <span class="label">Total Tenders</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <span class="number" th:text="${openTenders     != null ? openTenders     : '0'}">0</span>
+                    <span class="label">Open Tenders</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── HOW IT WORKS ── -->
+<section class="how-section">
+    <div class="container">
+        <div class="section-title">
+            <div class="badge-tag">How It Works</div>
+            <h2>Simple. Transparent. Automated.</h2>
+            <p>From signup to result — everything runs automatically.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-icon" style="background:#e8edff">📝</div>
+                    <h5>1. Sign Up</h5>
+                    <p>Register as User, Government, or Company. Each role unlocks different features.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-icon" style="background:#d1f0e3">📋</div>
+                    <h5>2. Create / Browse</h5>
+                    <p>Government & Companies publish tenders and auctions. All users can browse live listings.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-icon" style="background:#fff3d4">⚡</div>
+                    <h5>3. Bid & Participate</h5>
+                    <p>Companies fill tenders (lowest wins). All users bid on auctions (highest wins).</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-icon" style="background:#fde8e8">🏆</div>
+                    <h5>4. Auto Results</h5>
+                    <p>System auto-declares winners after deadline. Email sent to all participants.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── ROLES ── -->
+<section class="roles-section">
+    <div class="container">
+        <div class="section-title">
+            <div class="badge-tag" style="background:rgba(255,255,255,0.1);color:#fff">Who Can Join</div>
+            <h2 style="color:#fff">Built for Every Role</h2>
+            <p style="color:rgba(255,255,255,0.55)">Role-based access ensures the right people see and do the right things.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-sm-6 col-lg-3">
+                <div class="role-card">
+                    <div class="role-icon">👑</div>
+                    <h5>Admin</h5>
+                    <p>Full control — manage users, auctions, tenders, and platform settings.</p>
+                    <span class="role-badge" style="background:rgba(155,89,182,0.2);color:#c39bd3">Full Access</span>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="role-card">
+                    <div class="role-icon">🏛️</div>
+                    <h5>Government</h5>
+                    <p>Create and manage official tenders and auctions for public procurement.</p>
+                    <span class="role-badge" style="background:rgba(78,115,223,0.2);color:#7fb3f5">Create & Manage</span>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="role-card">
+                    <div class="role-icon">🏢</div>
+                    <h5>Company</h5>
+                    <p>Fill tender proposals and participate in auctions. Win contracts competitively.</p>
+                    <span class="role-badge" style="background:rgba(28,200,138,0.2);color:#6fe0b8">Bid & Fill</span>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="role-card">
+                    <div class="role-icon">👤</div>
+                    <h5>User</h5>
+                    <p>Participate in public auctions. Place bids and win items in real time.</p>
+                    <span class="role-badge" style="background:rgba(246,194,62,0.2);color:#f9d77e">Auctions Only</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── FEATURED LISTINGS PREVIEW ── -->
+<section class="preview-section">
+    <div class="container">
+        <div class="section-title">
+            <div class="badge-tag">Live Now</div>
+            <h2>Active Auctions & Tenders</h2>
+            <p>Latest live listings open for participation right now.</p>
+        </div>
+        <div class="row g-4">
+            <!-- Auction Preview -->
+            <div class="col-md-6">
+                <div class="preview-card">
+                    <div class="card-top">
+                        <h5>🔨 Live Auctions</h5>
+                        <p th:text="${(openAuctions != null ? openAuctions : 0) + ' auctions currently open for bidding'}">0 auctions open</p>
+                    </div>
+                    <div class="card-body-inner">
+                        <div th:if="${recentAuctions != null and !#lists.isEmpty(recentAuctions)}">
+                            <div th:each="a, i : ${recentAuctions}" th:if="${i.index < 3}"
+                                 style="padding:10px 0; border-bottom:1px solid #f5f5f5;">
+                                <div class="inner-title" th:text="${a.title}">Title</div>
+                                <div class="inner-meta">
+                                    ⏱ Closes: <span th:text="${a.deadline}">Deadline</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:unless="${recentAuctions != null and !#lists.isEmpty(recentAuctions)}"
+                             class="text-center text-muted py-3">No active auctions yet.</div>
+                        <a th:href="@{/auctions}"
+                           style="display:block;text-align:center;margin-top:16px;
+                                  background:#e8edff;color:var(--primary);
+                                  padding:10px;border-radius:8px;font-weight:600;
+                                  text-decoration:none;font-size:0.88rem;">
+                            View All Auctions →
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- Tender Preview -->
+            <div class="col-md-6">
+                <div class="preview-card">
+                    <div class="card-top green">
+                        <h5>📋 Active Tenders</h5>
+                        <p th:text="${openTenders + ' tenders currently open for proposals'}">0 tenders open</p>
+                    </div>
+                    <div class="card-body-inner">
+                        <div th:if="${recentTenders != null and !#lists.isEmpty(recentTenders)}">
+                            <div th:each="t, i : ${recentTenders}" th:if="${i.index < 3}"
+                                 style="padding:10px 0; border-bottom:1px solid #f5f5f5;">
+                                <div class="inner-title" th:text="${t.title}">Title</div>
+                                <div class="inner-meta">
+                                    📅 Deadline: <span th:text="${t.endDate}">Date</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:unless="${recentTenders != null and !#lists.isEmpty(recentTenders)}"
+                             class="text-center text-muted py-3">No active tenders yet.</div>
+                        <a th:href="@{/tenders}"
+                           style="display:block;text-align:center;margin-top:16px;
+                                  background:#d1f0e3;color:#13a06e;
+                                  padding:10px;border-radius:8px;font-weight:600;
+                                  text-decoration:none;font-size:0.88rem;">
+                            View All Tenders →
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── CTA ── -->
+<section class="cta-section">
+    <h2>Ready to Get Started?</h2>
+    <p>Join thousands of users, companies and government bodies on SmartPortal today.</p>
+    <a th:href="@{/signup}" class="btn-cta">Create Free Account →</a>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="footer-brand">🏛️ SmartPortal</div>
+                <p class="footer-desc">India's automated tender and auction management platform. Transparent, fast, and fair.</p>
+            </div>
+            <div class="col-md-2 col-6 footer-links">
+                <h6>Platform</h6>
+                <a th:href="@{/auctions}">Auctions</a>
+                <a th:href="@{/tenders}">Tenders</a>
+                <a th:href="@{/about}">About Us</a>
+                <a th:href="@{/contact}">Contact</a>
+            </div>
+            <div class="col-md-2 col-6 footer-links">
+                <h6>Account</h6>
+                <a th:href="@{/login}">Login</a>
+                <a th:href="@{/signup}">Sign Up</a>
+            </div>
+            <div class="col-md-4 footer-links">
+                <h6>Contact</h6>
+                <a href="#">📧 support@smartportal.in</a>
+                <a href="#">📞 +91 98765 43210</a>
+                <a href="#">📍 New Delhi, India</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2025 SmartPortal. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Live Clock
+    function updateClock() {
+        const now = new Date();
+        const options = {
+            weekday: 'short', year: 'numeric', month: 'short',
+            day: '2-digit', hour: '2-digit', minute: '2-digit',
+            second: '2-digit', hour12: true
+        };
+        document.getElementById('liveClock').textContent =
+            now.toLocaleString('en-IN', options);
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+</script>
+
+<link rel="stylesheet" th:href="@{/css/chatbot.css}">
+<script th:src="@{/js/chatbot.js}"></script>
+</body>
+</html>

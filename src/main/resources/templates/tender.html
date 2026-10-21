@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Tenders | Smart Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #4e73df; --dark: #1a1c23; --light-bg: #f8f9fc; --gold:#f6c23e; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--light-bg); }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            background: var(--dark);
+            padding: 0 40px;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+        .navbar .brand {
+            color: #fff;
+            font-size: 1.25rem;
+            font-weight: 800;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .navbar .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .navbar .nav-links a {
+            color: rgba(255,255,255,0.75);
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .navbar .nav-links a:hover,
+        .navbar .nav-links a.active {
+            color: #fff;
+            background: rgba(255,255,255,0.1);
+        }
+        .navbar .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-login-nav {
+            background: transparent;
+            border: 1.5px solid rgba(255,255,255,0.35);
+            color: #fff;
+            padding: 7px 18px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-login-nav:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .btn-signup-nav {
+            background: var(--primary);
+            border: none;
+            color: #fff;
+            padding: 7px 18px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        .btn-signup-nav:hover { opacity: 0.85; color: #fff; }
+
+        /* ── LIVE CLOCK ── */
+        .live-clock-bar {
+            background: var(--primary);
+            color: #fff;
+            text-align: center;
+            padding: 7px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.02rem;
+        }
+        #liveClock { font-weight: 700; font-size: 0.95rem; }
+
+        /* ── Hero Banner ── */
+        .hero {
+            background: linear-gradient(135deg, #1cc88a 0%, #13a06e 100%);
+            color: #fff;
+            padding: 60px 30px;
+            text-align: center;
+        }
+        .hero h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 10px; }
+        .hero p { font-size: 1rem; opacity: 0.85; margin: 0; }
+
+        /* ── Table Card ── */
+        .table-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+            overflow: hidden;
+        }
+        .table-card .table { margin: 0; }
+        .table-card thead { background: #f1f3fb; }
+        .table-card thead th { font-size: 0.82rem; text-transform: uppercase;
+            letter-spacing: 0.05rem; color: #6c757d; font-weight: 600; padding: 14px 16px; border: none; }
+        .table-card tbody tr { transition: background 0.15s; }
+        .table-card tbody tr:hover { background: #f8f9fc; }
+        .table-card tbody td { padding: 14px 16px; vertical-align: middle;
+            border-top: 1px solid #f0f0f0; font-size: 0.9rem; }
+
+        /* ── Category Badges ── */
+        .badge-infra  { background: #cfe2ff; color: #084298; }
+        .badge-tech   { background: #d1e7dd; color: #0a3622; }
+        .badge-supply { background: #fff3cd; color: #664d03; }
+        .cat-badge {
+            display: inline-block; padding: 4px 12px; border-radius: 20px;
+            font-size: 0.78rem; font-weight: 600;
+        }
+
+        /* ── Date display ── */
+        .date-range { font-size: 0.85rem; color: #555; }
+        .date-range span { font-weight: 600; color: #333; }
+
+        /* ── Status pill ── */
+        .status-open   { background: #d1e7dd; color: #0a3622; padding: 3px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; }
+        .status-closed { background: #f8d7da; color: #842029; padding: 3px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; }
+
+        /* ── Empty State ── */
+        .empty-state { text-align: center; padding: 80px 20px; color: #aaa; }
+        .empty-state .icon { font-size: 4rem; margin-bottom: 16px; }
+
+        /* ── FOOTER ── */
+        footer {
+            background: var(--dark);
+            color: rgba(255,255,255,0.5);
+            padding: 50px 0 24px;
+            margin-top: 60px;
+        }
+        .footer-brand { color: #fff; font-size: 1.2rem; font-weight: 800; margin-bottom: 10px; }
+        .footer-desc { font-size: 0.85rem; color: rgba(255,255,255,0.45); line-height: 1.6; max-width: 280px; }
+        .footer-links h6 { color: #fff; font-weight: 700; font-size: 0.85rem; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.05rem; }
+        .footer-links a { display: block; color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.85rem; margin-bottom: 8px; transition: color 0.2s; }
+        .footer-links a:hover { color: #fff; }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); margin-top: 40px; padding-top: 20px; text-align: center; font-size: 0.82rem; }
+    </style>
+</head>
+<body>
+
+<!-- ── LIVE CLOCK BAR ── -->
+<div class="live-clock-bar">
+    🕐 Live: <span id="liveClock"></span>
+</div>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar">
+    <a href="/" class="brand">🏛️ SmartPortal</a>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a th:href="@{/auctions}">Auctions</a>
+        <a th:href="@{/tenders}" class="active">Tenders</a>
+        <a th:href="@{/about}">About</a>
+        <a th:href="@{/contact}">Contact</a>
+    </div>
+    <div class="nav-right">
+        <a th:href="@{/login}"  class="btn-login-nav">Login</a>
+        <a th:href="@{/signup}" class="btn-signup-nav">Sign Up</a>
+    </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+    <h1>📋 Active Tenders</h1>
+    <p>Browse all published tenders — updated by admin and users in real-time</p>
+</div>
+
+<!-- Content -->
+<div class="container py-5">
+
+    <!-- Stats bar -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <span class="text-muted small">
+            Showing <strong th:text="${#lists.size(tenders)}">0</strong> tender(s)
+        </span>
+        <span class="badge bg-success px-3 py-2">● Active</span>
+    </div>
+
+    <!-- Empty state -->
+    <div th:if="${#lists.isEmpty(tenders)}" class="empty-state">
+        <div class="icon">📭</div>
+        <h5>No tenders published yet</h5>
+        <p>Check back later for new tender opportunities.</p>
+    </div>
+
+    <!-- Tender Table -->
+    <div th:unless="${#lists.isEmpty(tenders)}" class="table-card">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Tender Title</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="t, stat : ${tenders}">
+                    <!-- Row number -->
+                    <td class="text-muted" th:text="${stat.index + 1}">1</td>
+
+                    <!-- Title -->
+                    <td>
+                        <strong th:text="${t.title}">Title</strong>
+                    </td>
+
+                    <!-- Category badge -->
+                    <td>
+                        <span th:if="${t.category == 'Infrastructure'}"
+                              class="cat-badge badge-infra" th:text="${t.category}"></span>
+                        <span th:if="${t.category == 'Technology'}"
+                              class="cat-badge badge-tech" th:text="${t.category}"></span>
+                        <span th:if="${t.category == 'Supply Chain'}"
+                              class="cat-badge badge-supply" th:text="${t.category}"></span>
+                        <span th:if="${t.category != 'Infrastructure' and t.category != 'Technology' and t.category != 'Supply Chain'}"
+                              class="cat-badge" style="background:#e2e3e5;color:#41464b;" th:text="${t.category}"></span>
+                    </td>
+
+                    <!-- Description (truncated) -->
+                    <td class="text-muted" style="max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"
+                        th:text="${t.description}">Description</td>
+
+                    <!-- Start Date -->
+                    <td>
+                        <div class="date-range">📅 <span th:text="${t.startDate}">Start</span></div>
+                    </td>
+
+                    <!-- End Date -->
+                    <td>
+                        <div class="date-range">🏁 <span th:text="${t.endDate}">End</span></div>
+                    </td>
+
+                    <!-- Status -->
+                    <td>
+                        <span th:if="${t.endDate != null and !t.endDate.isBefore(#temporals.createToday())}"
+						      class="status-open">Open</span>
+						<span th:if="${t.endDate == null or t.endDate.isBefore(#temporals.createToday())}"
+						      class="status-closed">Closed</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <nav class="d-flex justify-content-center gap-3 mt-4" th:if="${page.totalPages > 1}">
+        <a class="btn btn-outline-primary" th:if="${page.hasPrevious()}"
+           th:href="@{/tenders(page=${page.number - 1},size=${page.size})}">Previous</a>
+        <span class="align-self-center"
+              th:text="'Page ' + ${page.number + 1} + ' of ' + ${page.totalPages}">Page</span>
+        <a class="btn btn-outline-primary" th:if="${page.hasNext()}"
+           th:href="@{/tenders(page=${page.number + 1},size=${page.size})}">Next</a>
+    </nav>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer>
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="footer-brand">🏛️ SmartPortal</div>
+                <p class="footer-desc">India's automated tender and auction management platform. Transparent, fast, and fair.</p>
+            </div>
+            <div class="col-md-2 col-6 footer-links">
+                <h6>Platform</h6>
+                <a th:href="@{/auctions}">Auctions</a>
+                <a th:href="@{/tenders}">Tenders</a>
+                <a th:href="@{/about}">About Us</a>
+                <a th:href="@{/contact}">Contact</a>
+            </div>
+            <div class="col-md-2 col-6 footer-links">
+                <h6>Account</h6>
+                <a th:href="@{/login}">Login</a>
+                <a th:href="@{/signup}">Sign Up</a>
+            </div>
+            <div class="col-md-4 footer-links">
+                <h6>Contact</h6>
+                <a href="#">📧 support@smartportal.in</a>
+                <a href="#">📞 +91 98765 43210</a>
+                <a href="#">📍 New Delhi, India</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2025 SmartPortal. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function updateClock() {
+        const now = new Date();
+        const options = {
+            weekday: 'short', year: 'numeric', month: 'short',
+            day: '2-digit', hour: '2-digit', minute: '2-digit',
+            second: '2-digit', hour12: true
+        };
+        document.getElementById('liveClock').textContent =
+            now.toLocaleString('en-IN', options);
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+</script>
+
+<link rel="stylesheet" th:href="@{/css/chatbot.css}">
+<script th:src="@{/js/chatbot.js}"></script>
+</body>
+</html>

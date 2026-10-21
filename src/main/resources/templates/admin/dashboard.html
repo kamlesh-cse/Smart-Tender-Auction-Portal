@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | SmartPortal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-w: 260px;
+            --primary: #4e73df;
+            --green: #1cc88a;
+            --yellow: #f6c23e;
+            --red: #e74a3b;
+            --dark: #1a1c23;
+            --light: #f8f9fc;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light);
+            margin: 0;
+        }
+
+        /* ── SIDEBAR ── */
+        #sidebar {
+            width: var(--sidebar-w);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: var(--dark);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            padding: 22px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            text-align: center;
+        }
+
+        .sidebar-brand .logo {
+            font-size: 1.5rem;
+        }
+
+        .sidebar-brand h5 {
+            color: #fff;
+            font-weight: 800;
+            margin: 6px 0 2px;
+            font-size: 1rem;
+        }
+
+        .sidebar-brand small {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.75rem;
+        }
+
+        .nav-section {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+            color: rgba(255, 255, 255, 0.3);
+            padding: 18px 20px 6px;
+            font-weight: 600;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.65);
+            text-decoration: none;
+            padding: 11px 20px;
+            font-size: 0.87rem;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.06);
+            border-left-color: var(--primary);
+        }
+
+        .sidebar-link .icon {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .logout-btn {
+            display: block;
+            text-align: center;
+            background: rgba(231, 74, 59, 0.15);
+            color: #e74a3b;
+            border: 1px solid rgba(231, 74, 59, 0.3);
+            padding: 9px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(231, 74, 59, 0.25);
+            color: #e74a3b;
+        }
+
+        /* ── MAIN CONTENT ── */
+        #main {
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── TOP BAR ── */
+        .topbar {
+            background: #fff;
+            padding: 0 30px;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 0 #eee;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .topbar h5 {
+            font-weight: 700;
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .topbar .right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .clock-badge {
+            background: var(--light);
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .admin-badge {
+            background: linear-gradient(135deg, var(--primary), #224abe);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        /* ── PAGE BODY ── */
+        .page-body {
+            padding: 28px 30px;
+            flex: 1;
+        }
+
+        /* ── FLASH MESSAGES ── */
+        .alert {
+            border-radius: 10px;
+            font-size: 0.87rem;
+            border: none;
+        }
+
+        .alert-success {
+            background: #d1f0e3;
+            color: #0a5c38;
+        }
+
+        .alert-danger {
+            background: #fde8e8;
+            color: #7b1a1a;
+        }
+
+        /* ── STAT CARDS ── */
+        .stat-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 22px 20px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-left: 4px solid transparent;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-card.blue {
+            border-left-color: var(--primary);
+        }
+
+        .stat-card.green {
+            border-left-color: var(--green);
+        }
+
+        .stat-card.yellow {
+            border-left-color: var(--yellow);
+        }
+
+        .stat-card.red {
+            border-left-color: var(--red);
+        }
+
+        .stat-card.purple {
+            border-left-color: #9b59b6;
+        }
+
+        .stat-card.teal {
+            border-left-color: #36b9cc;
+        }
+
+        .stat-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.blue {
+            background: #e8edff;
+        }
+
+        .stat-icon.green {
+            background: #d1f0e3;
+        }
+
+        .stat-icon.yellow {
+            background: #fff3d4;
+        }
+
+        .stat-icon.red {
+            background: #fde8e8;
+        }
+
+        .stat-icon.purple {
+            background: #f0e8ff;
+        }
+
+        .stat-icon.teal {
+            background: #e0f7fa;
+        }
+
+        .stat-info .number {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--dark);
+            line-height: 1;
+        }
+
+        .stat-info .label {
+            font-size: 0.78rem;
+            color: #999;
+            font-weight: 500;
+            margin-top: 3px;
+        }
+
+        .stat-info .sub {
+            font-size: 0.75rem;
+            color: #bbb;
+            margin-top: 2px;
+        }
+
+        /* ── SECTION HEADERS ── */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .section-header h6 {
+            font-weight: 700;
+            color: var(--dark);
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .btn-sm-action {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .btn-sm-action:hover {
+            opacity: 0.85;
+            color: #fff;
+        }
+
+        /* ── TABLES ── */
+        .data-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .data-card .table {
+            margin: 0;
+            font-size: 0.85rem;
+        }
+
+        .data-card thead th {
+            background: var(--light);
+            color: #888;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+            font-weight: 700;
+            border: none;
+            padding: 12px 16px;
+        }
+
+        .data-card tbody td {
+            padding: 12px 16px;
+            vertical-align: middle;
+            border-top: 1px solid #f5f5f5;
+            color: #444;
+        }
+
+        .data-card tbody tr:hover {
+            background: #fafbff;
+        }
+
+        /* ── STATUS BADGES ── */
+        .badge-open {
+            background: #d1f0e3;
+            color: #0a5c38;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-closed {
+            background: #fde8e8;
+            color: #7b1a1a;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-role {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .role-admin {
+            background: #f0e8ff;
+            color: #6c3483;
+        }
+
+        .role-govt {
+            background: #e8edff;
+            color: #1a5276;
+        }
+
+        .role-company {
+            background: #d1f0e3;
+            color: #0a5c38;
+        }
+
+        .role-user {
+            background: #fff3d4;
+            color: #7d6608;
+        }
+
+        /* ── ACTION BTNS ── */
+        .btn-tbl-edit {
+            background: #fff3d4;
+            color: #7d6608;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .btn-tbl-del {
+            background: #fde8e8;
+            color: #7b1a1a;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .btn-tbl-view {
+            background: #e8edff;
+            color: #1a3a6b;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ══════════════════════ SIDEBAR ══════════════════════ -->
+    <th:block th:replace="~{fragments/sidebar :: sidebarStyles}"></th:block>
+    <th:block th:replace="~{fragments/sidebar :: sidebar('ADMIN','dashboard')}"></th:block>
+
+    <!-- ══════════════════════ MAIN ══════════════════════ -->
+    <div id="main">
+
+        <!-- Top Bar -->
+        <div class="topbar">
+            <h5>📊 Admin Dashboard</h5>
+            <div class="right">
+                <div class="clock-badge">🕐 <span id="clock"></span></div>
+                <div class="admin-badge">👑 <span th:text="${adminName}">Admin</span></div>
+            </div>
+        </div>
+
+        <!-- Page Body -->
+        <div class="page-body">
+
+            <!-- Flash Messages -->
+            <div th:if="${success}" class="alert alert-success mb-3" th:text="${success}"></div>
+            <div th:if="${error}" class="alert alert-danger  mb-3" th:text="${error}"></div>
+
+            <!-- ── ROW 1: USER STATS ── -->
+            <div class="row g-3 mb-3">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card blue">
+                        <div class="stat-icon blue">👥</div>
+                        <div class="stat-info">
+                            <div class="number" th:text="${totalUsers}">0</div>
+                            <div class="label">Total Users</div>
+                            <div class="sub"
+                                th:text="${govtUsers + ' Govt · ' + companyUsers + ' Companies · ' + regularUsers + ' Users'}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card purple">
+                        <div class="stat-icon purple">🏛️</div>
+                        <div class="stat-info">
+                            <div class="number" th:text="${govtUsers}">0</div>
+                            <div class="label">Government</div>
+                            <div class="sub">Registered bodies</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card green">
+                        <div class="stat-icon green">🏢</div>
+                        <div class="stat-info">
+                            <div class="number" th:text="${companyUsers}">0</div>
+                            <div class="label">Companies</div>
+                            <div class="sub">Active bidders</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card yellow">
+                        <div class="stat-icon yellow">👤</div>
+                        <div class="stat-info">
+                            <div class="number" th:text="${regularUsers}">0</div>
+                            <div class="label">Regular Users</div>
+                            <div class="sub">Auction participants</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── ROW 2: AUCTION & TENDER STATS ── -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card blue">
+                        <div class="stat-icon blue">🔨</div>
+                        <div class="stat-info">
+                            <div class="number" th:text="${totalAuctions}">0</div>
+                            <div class="label">Total Auctions</div>
+                            <div class="sub" th:text="${openAuctions + ' open · ' + closedAuctions + ' closed'}"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card green">
+                        <div class="stat-icon green">✅</div>
+                        <div class="stat-info">
+                            <div class="number" th:text="${openAuctions}">0</div>
+                            <div class="label">Live Auctions</div>
+                            <div class="sub">Currently accepting bids</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card teal">
+                        <div class="stat-icon teal">📋</div>
+                        <div class="stat-info">
+                            <div class="number" th:text="${totalTenders}">0</div>
+                            <div class="label">Total Tenders</div>
+                            <div class="sub" th:text="${openTenders + ' open · ' + closedTenders + ' closed'}"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card green">
+                        <div class="stat-icon green">📂</div>
+                        <div class="stat-info">
+                            <div class="number" th:text="${openTenders}">0</div>
+                            <div class="label">Open Tenders</div>
+                            <div class="sub">Accepting proposals</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── ROW 3: TABLES ── -->
+            <div class="row g-4">
+
+                <!-- Recent Auctions -->
+                <div class="col-lg-6">
+                    <div class="section-header">
+                        <h6>🔨 Recent Auctions</h6>
+                        <a th:href="@{/admin/auctions}" class="btn-sm-action">View All</a>
+                    </div>
+                    <div class="data-card">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Status</th>
+                                    <th>Deadline</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="a : ${recentAuctions}">
+                                    <td th:text="${a.title}">Title</td>
+                                    <td>
+                                        <span th:if="${a.lifecycleStatus == 'LIVE'}" class="badge-open">LIVE</span>
+                                        <span th:unless="${a.lifecycleStatus == 'LIVE'}" th:style="${a.lifecycleStatus == 'UPCOMING' ? 'background:#fff3d4;color:#7d6608;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700' : 'background:#e5e7eb;color:#4b5563;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700'}" th:text="${a.lifecycleStatus}">CLOSED</span>
+                                    </td>
+                                    <td style="font-size:0.78rem" th:text="${a.deadline}">—</td>
+                                    <td>
+                                        <a th:href="@{'/admin/auction/view/' + ${a.id}}"
+                                            class="btn-tbl-view me-1">View</a>
+                                        <form th:action="@{'/admin/auction/delete/' + ${a.id}}" method="post"
+                                            style="display:inline" onsubmit="return confirm('Delete this auction?')"><input type="hidden" name="_csrf" th:value="${_csrf}" />
+                                            <button type="submit" class="btn-tbl-del">Del</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(recentAuctions)}">
+                                    <td colspan="4" class="text-center text-muted py-3">No auctions yet</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Recent Tenders -->
+                <div class="col-lg-6">
+                    <div class="section-header">
+                        <h6>📋 Recent Tenders</h6>
+                        <a th:href="@{/admin/tenders}" class="btn-sm-action">View All</a>
+                    </div>
+                    <div class="data-card">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="t : ${recentTenders}">
+                                    <td th:text="${t.title}">Title</td>
+                                    <td style="font-size:0.78rem" th:text="${t.category}">—</td>
+                                    <td>
+                                        <span th:if="${t.status == 'OPEN'}" class="badge-open">OPEN</span>
+                                        <span th:unless="${t.status == 'OPEN'}" class="badge-closed">CLOSED</span>
+                                    </td>
+                                    <td>
+                                        <a th:href="@{'/admin/tender/view/' + ${t.id}}"
+                                            class="btn-tbl-view me-1">View</a>
+                                        <form th:action="@{'/admin/tender/delete/' + ${t.id}}" method="post"
+                                            style="display:inline" onsubmit="return confirm('Delete this tender?')"><input type="hidden" name="_csrf" th:value="${_csrf}" />
+                                            <button type="submit" class="btn-tbl-del">Del</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(recentTenders)}">
+                                    <td colspan="4" class="text-center text-muted py-3">No tenders yet</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Recent Users -->
+                <div class="col-12">
+                    <div class="section-header">
+                        <h6>👥 Recent Registrations</h6>
+                        <a th:href="@{/admin/users}" class="btn-sm-action">Manage All</a>
+                    </div>
+                    <div class="data-card">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Mobile</th>
+                                    <th>Role</th>
+                                    <th>Organisation</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="u : ${recentUsers}">
+                                    <td th:text="${u.name}">Name</td>
+                                    <td th:text="${u.email}">Email</td>
+                                    <td th:text="${u.mobile}">Mobile</td>
+                                    <td>
+                                        <span th:if="${u.role == 'GOVERNMENT'}" class="badge-role role-govt">GOVT</span>
+                                        <span th:if="${u.role == 'COMPANY'}"
+                                            class="badge-role role-company">COMPANY</span>
+                                        <span th:if="${u.role == 'USER'}" class="badge-role role-user">USER</span>
+                                        <span th:if="${u.role == 'ADMIN'}" class="badge-role role-admin">ADMIN</span>
+                                    </td>
+                                    <td th:text="${u.organisation != null ? u.organisation : '—'}">—</td>
+                                    <td>
+                                        <span th:if="${u.active}" class="badge-open">Active</span>
+                                        <span th:unless="${u.active}" class="badge-closed">Blocked</span>
+                                    </td>
+                                    <td>
+                                        <form th:action="@{'/admin/user/toggle/' + ${u.id}}" method="post"
+                                            style="display:inline"><input type="hidden" name="_csrf" th:value="${_csrf}" />
+                                            <button type="submit" class="btn-tbl-edit me-1">Toggle</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(recentUsers)}">
+                                    <td colspan="7" class="text-center text-muted py-3">No users yet</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div><!-- end row -->
+        </div><!-- end page-body -->
+    </div><!-- end main -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateClock() {
+            document.getElementById('clock').textContent =
+                new Date().toLocaleString('en-IN', {
+                    day: '2-digit', month: 'short', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
+                });
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
+
+<link rel="stylesheet" th:href="@{/css/chatbot.css}">
+<script th:src="@{/js/chatbot.js}"></script>
+</body>
+
+</html>

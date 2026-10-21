@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Government Dashboard | SmartPortal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-w: 260px;
+            --primary: #2d6a4f;
+            --accent: #1cc88a;
+            --yellow: #f6c23e;
+            --red: #e74a3b;
+            --dark: #1a1c23;
+            --light: #f8f9fc;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light);
+            margin: 0;
+        }
+
+        #sidebar {
+            width: var(--sidebar-w);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: var(--dark);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            padding: 22px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            text-align: center;
+        }
+
+        .sidebar-brand .logo {
+            font-size: 1.5rem;
+        }
+
+        .sidebar-brand h5 {
+            color: #fff;
+            font-weight: 800;
+            margin: 6px 0 2px;
+            font-size: 1rem;
+        }
+
+        .sidebar-brand small {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.75rem;
+        }
+
+        .nav-section {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+            color: rgba(255, 255, 255, 0.3);
+            padding: 18px 20px 6px;
+            font-weight: 600;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.65);
+            text-decoration: none;
+            padding: 11px 20px;
+            font-size: 0.87rem;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.06);
+            border-left-color: var(--accent);
+        }
+
+        .sidebar-link .icon {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .logout-btn {
+            display: block;
+            text-align: center;
+            background: rgba(231, 74, 59, 0.15);
+            color: #e74a3b;
+            border: 1px solid rgba(231, 74, 59, 0.3);
+            padding: 9px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            background: rgba(231, 74, 59, 0.25);
+            color: #e74a3b;
+        }
+
+        #main {
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            background: #fff;
+            padding: 0 30px;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 0 #eee;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .topbar h5 {
+            font-weight: 700;
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .clock-badge {
+            background: var(--light);
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .user-badge {
+            background: linear-gradient(135deg, var(--primary), #1a4a35);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .page-body {
+            padding: 28px 30px;
+            flex: 1;
+        }
+
+        .alert {
+            border-radius: 10px;
+            font-size: 0.87rem;
+            border: none;
+        }
+
+        .alert-success {
+            background: #d1f0e3;
+            color: #0a5c38;
+        }
+
+        .alert-danger {
+            background: #fde8e8;
+            color: #7b1a1a;
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--primary), #1a4a35);
+            border-radius: 14px;
+            padding: 24px 28px;
+            color: #fff;
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .welcome-banner h4 {
+            font-weight: 800;
+            margin: 0 0 4px;
+            font-size: 1.2rem;
+        }
+
+        .welcome-banner p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 0.88rem;
+        }
+
+        .welcome-actions {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .btn-banner {
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-banner-primary {
+            background: #fff;
+            color: var(--primary);
+        }
+
+        .btn-banner-outline {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .stat-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 22px 20px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-left: 4px solid transparent;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-card.green {
+            border-left-color: var(--accent);
+        }
+
+        .stat-card.blue {
+            border-left-color: #4e73df;
+        }
+
+        .stat-card.yellow {
+            border-left-color: var(--yellow);
+        }
+
+        .stat-card.red {
+            border-left-color: var(--red);
+        }
+
+        .stat-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.green {
+            background: #d1f0e3;
+        }
+
+        .stat-icon.blue {
+            background: #e8edff;
+        }
+
+        .stat-icon.yellow {
+            background: #fff3d4;
+        }
+
+        .stat-icon.red {
+            background: #fde8e8;
+        }
+
+        .stat-info .number {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--dark);
+            line-height: 1;
+        }
+
+        .stat-info .label {
+            font-size: 0.78rem;
+            color: #999;
+            font-weight: 500;
+            margin-top: 3px;
+        }
+
+        .stat-info .sub {
+            font-size: 0.75rem;
+            color: #bbb;
+            margin-top: 2px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .section-header h6 {
+            font-weight: 700;
+            color: var(--dark);
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .btn-sm-action {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .btn-sm-action:hover {
+            opacity: 0.85;
+            color: #fff;
+        }
+
+        .data-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .data-card .table {
+            margin: 0;
+            font-size: 0.85rem;
+        }
+
+        .data-card thead th {
+            background: var(--light);
+            color: #888;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            border: none;
+            padding: 12px 16px;
+        }
+
+        .data-card tbody td {
+            padding: 12px 16px;
+            vertical-align: middle;
+            border-top: 1px solid #f5f5f5;
+            color: #444;
+        }
+
+        .data-card tbody tr:hover {
+            background: #fafff8;
+        }
+
+        .badge-open {
+            background: #d1f0e3;
+            color: #0a5c38;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-closed {
+            background: #fde8e8;
+            color: #7b1a1a;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .btn-tbl-view {
+            background: #e8edff;
+            color: #1a3a6b;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .btn-tbl-del {
+            background: #fde8e8;
+            color: #7b1a1a;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <th:block th:replace="~{fragments/sidebar :: sidebarStyles}"></th:block>
+    <th:block th:replace="~{fragments/sidebar :: sidebar('GOVERNMENT','dashboard')}"></th:block>
+
+    <div id="main">
+        <div class="topbar">
+            <h5>🏛️ Government Dashboard</h5>
+            <div style="display:flex;align-items:center;gap:14px">
+                <div class="clock-badge">🕐 <span id="clock"></span></div>
+                <div class="user-badge">🏛️ <span th:text="${govName}">Official</span></div>
+            </div>
+        </div>
+
+        <div class="page-body">
+            <div th:if="${success}" class="alert alert-success mb-3" th:text="${success}"></div>
+            <div th:if="${error}" class="alert alert-danger  mb-3" th:text="${error}"></div>
+
+            <!-- Welcome Banner -->
+            <div class="welcome-banner mb-4">
+                <div>
+                    <h4>Welcome back, <span th:text="${govName}">Official</span>! 👋</h4>
+                    <p th:text="${govOrg != null ? govOrg : 'Government Department'}">Department</p>
+                </div>
+                <div class="welcome-actions">
+                    <a th:href="@{/government/auction/create}" class="btn-banner btn-banner-primary">
+                        🔨 New Auction
+                    </a>
+                    <a th:href="@{/government/tender/create}" class="btn-banner btn-banner-outline">
+                        📋 New Tender
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card green">
+                        <div class="stat-icon green">🔨</div>
+                        <div class="stat-info">
+                            <div class="number" th:text="${#lists.size(myAuctions)}">0</div>
+                            <div class="label">My Auctions</div>
+                            <div class="sub" th:text="${openAuctions + ' live · ' + closedAuctions + ' closed'}"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card blue">
+                        <div class="stat-icon blue">✅</div>
+                        <div class="stat-info">
+                            <div class="number" th:text="${openAuctions}">0</div>
+                            <div class="label">Live Auctions</div>
+                            <div class="sub">Accepting bids now</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card green">
+                        <div class="stat-icon green">📋</div>
+                        <div class="stat-info">
+                            <div class="number" th:text="${#lists.size(myTenders)}">0</div>
+                            <div class="label">My Tenders</div>
+                            <div class="sub" th:text="${openTenders + ' open · ' + closedTenders + ' closed'}"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card yellow">
+                        <div class="stat-icon yellow">📂</div>
+                        <div class="stat-info">
+                            <div class="number" th:text="${openTenders}">0</div>
+                            <div class="label">Open Tenders</div>
+                            <div class="sub">Accepting proposals</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tables -->
+            <div class="row g-4">
+                <!-- My Recent Auctions -->
+                <div class="col-lg-6">
+                    <div class="section-header">
+                        <h6>🔨 My Recent Auctions</h6>
+                        <a th:href="@{/government/auctions}" class="btn-sm-action">View All</a>
+                    </div>
+                    <div class="data-card">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Status</th>
+                                    <th>Deadline</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="a, auctionStat : ${myAuctions}" th:if="${auctionStat.index < 5}">
+                                    <td style="font-weight:600" th:text="${a.title}">—</td>
+                                    <td>
+                                        <span th:if="${a.lifecycleStatus == 'LIVE'}" class="badge-open">LIVE</span>
+                                        <span th:unless="${a.lifecycleStatus == 'LIVE'}" th:style="${a.lifecycleStatus == 'UPCOMING' ? 'background:#fff3d4;color:#7d6608;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700' : 'background:#e5e7eb;color:#4b5563;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700'}" th:text="${a.lifecycleStatus}">CLOSED</span>
+                                    </td>
+                                    <td style="font-size:0.78rem" th:text="${a.deadline}">—</td>
+                                    <td>
+                                        <a th:href="@{'/government/auction/view/' + ${a.id}}"
+                                            class="btn-tbl-view me-1">View</a>
+                                        <form th:action="@{'/government/auction/delete/' + ${a.id}}" method="post"
+                                            style="display:inline" onsubmit="return confirm('Delete this auction?')"><input type="hidden" name="_csrf" th:value="${_csrf}" />
+                                            <button type="submit" class="btn-tbl-del">Del</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(myAuctions)}">
+                                    <td colspan="4" class="text-center text-muted py-3">
+                                        No auctions yet. <a th:href="@{/government/auction/create}">Create one →</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- My Recent Tenders -->
+                <div class="col-lg-6">
+                    <div class="section-header">
+                        <h6>📋 My Recent Tenders</h6>
+                        <a th:href="@{/government/tenders}" class="btn-sm-action">View All</a>
+                    </div>
+                    <div class="data-card">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="t, tenderStat : ${myTenders}" th:if="${tenderStat.index < 5}">
+                                    <td style="font-weight:600" th:text="${t.title}">—</td>
+                                    <td style="font-size:0.78rem" th:text="${t.category}">—</td>
+                                    <td>
+                                        <span th:if="${t.status == 'OPEN'}" class="badge-open">OPEN</span>
+                                        <span th:unless="${t.status == 'OPEN'}" class="badge-closed">CLOSED</span>
+                                    </td>
+                                    <td>
+                                        <a th:href="@{'/government/tender/view/' + ${t.id}}"
+                                            class="btn-tbl-view me-1">View</a>
+                                        <form th:action="@{'/government/tender/delete/' + ${t.id}}" method="post"
+                                            style="display:inline" onsubmit="return confirm('Delete this tender?')"><input type="hidden" name="_csrf" th:value="${_csrf}" />
+                                            <button type="submit" class="btn-tbl-del">Del</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(myTenders)}">
+                                    <td colspan="4" class="text-center text-muted py-3">
+                                        No tenders yet. <a th:href="@{/government/tender/create}">Create one →</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateClock() {
+            document.getElementById('clock').textContent =
+                new Date().toLocaleString('en-IN', {
+                    day: '2-digit', month: 'short', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
+                });
+        }
+        updateClock(); setInterval(updateClock, 1000);
+    </script>
+
+<link rel="stylesheet" th:href="@{/css/chatbot.css}">
+<script th:src="@{/js/chatbot.js}"></script>
+</body>
+
+</html>

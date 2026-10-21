@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Tender | Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --sidebar-w:260px; --primary:#4e73df; --green:#1cc88a; --yellow:#f6c23e; --red:#e74a3b; --dark:#1a1c23; --light:#f8f9fc; }
+        * { box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:var(--light); margin:0; }
+        #sidebar { width:var(--sidebar-w); height:100vh; position:fixed; top:0; left:0; background:var(--dark); z-index:100; display:flex; flex-direction:column; overflow-y:auto; }
+        .sidebar-brand { padding:22px 20px; border-bottom:1px solid rgba(255,255,255,0.06); text-align:center; }
+        .sidebar-brand .logo { font-size:1.5rem; }
+        .sidebar-brand h5 { color:#fff; font-weight:800; margin:6px 0 2px; font-size:1rem; }
+        .sidebar-brand small { color:rgba(255,255,255,0.4); font-size:0.75rem; }
+        .nav-section { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1rem; color:rgba(255,255,255,0.3); padding:18px 20px 6px; font-weight:600; }
+        .sidebar-link { display:flex; align-items:center; gap:10px; color:rgba(255,255,255,0.65); text-decoration:none; padding:11px 20px; font-size:0.87rem; font-weight:500; border-left:3px solid transparent; transition:all 0.2s; }
+        .sidebar-link:hover, .sidebar-link.active { color:#fff; background:rgba(255,255,255,0.06); border-left-color:var(--primary); }
+        .sidebar-link .icon { font-size:1rem; width:20px; text-align:center; }
+        .sidebar-footer { margin-top:auto; padding:16px; border-top:1px solid rgba(255,255,255,0.06); }
+        .logout-btn { display:block; text-align:center; background:rgba(231,74,59,0.15); color:#e74a3b; border:1px solid rgba(231,74,59,0.3); padding:9px; border-radius:8px; text-decoration:none; font-size:0.85rem; font-weight:600; }
+        .logout-btn:hover { background:rgba(231,74,59,0.25); color:#e74a3b; }
+        #main { margin-left:var(--sidebar-w); min-height:100vh; display:flex; flex-direction:column; }
+        .topbar { background:#fff; padding:0 30px; height:65px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 1px 0 #eee; position:sticky; top:0; z-index:50; }
+        .topbar h5 { font-weight:700; color:var(--dark); margin:0; }
+        .clock-badge { background:var(--light); border:1px solid #e8e8e8; border-radius:8px; padding:6px 12px; font-size:0.8rem; color:#555; font-weight:600; }
+        .admin-badge { background:linear-gradient(135deg,var(--primary),#224abe); color:#fff; padding:6px 14px; border-radius:20px; font-size:0.8rem; font-weight:700; }
+        .page-body { padding:28px 30px; flex:1; }
+        .alert { border-radius:10px; font-size:0.87rem; border:none; }
+        .alert-success { background:#d1f0e3; color:#0a5c38; }
+        .alert-danger { background:#fde8e8; color:#7b1a1a; }
+        .form-card { background:#fff; border-radius:14px; box-shadow:0 2px 16px rgba(0,0,0,0.07); overflow:hidden; max-width:780px; margin:0 auto; }
+        .form-card-header { background:linear-gradient(135deg,var(--yellow),#e0a800); padding:22px 28px; }
+        .form-card-header h5 { color:#1a1c23; font-weight:700; margin:0; font-size:1.05rem; }
+        .form-card-header p { color:rgba(0,0,0,0.5); margin:4px 0 0; font-size:0.83rem; }
+        .form-card-body { padding:28px; }
+        .form-label { font-size:0.85rem; font-weight:600; color:#4e5e7a; margin-bottom:5px; }
+        .form-control, .form-select { border:1.5px solid #e0e4ef; border-radius:8px; padding:10px 14px; font-size:0.9rem; transition:border-color 0.2s; }
+        .form-control:focus, .form-select:focus { border-color:var(--yellow); box-shadow:0 0 0 3px rgba(246,194,62,0.15); }
+        .form-text { font-size:0.78rem; color:#aaa; margin-top:4px; }
+        .btn-submit { background:linear-gradient(135deg,var(--yellow),#e0a800); border:none; border-radius:8px; padding:11px 28px; font-weight:700; color:#1a1c23; font-size:0.92rem; cursor:pointer; transition:opacity 0.2s; }
+        .btn-submit:hover { opacity:0.88; }
+        .btn-cancel { background:var(--light); border:1.5px solid #e0e4ef; border-radius:8px; padding:11px 22px; font-weight:600; color:#666; font-size:0.92rem; text-decoration:none; }
+        .btn-cancel:hover { background:#eee; color:#444; }
+        .section-divider { font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08rem; color:#bbb; margin:20px 0 14px; padding-bottom:8px; border-bottom:1px solid #f0f0f0; }
+    </style>
+</head>
+<body>
+    <th:block th:replace="~{fragments/sidebar :: sidebarStyles}"></th:block>
+    <th:block th:replace="~{fragments/sidebar :: sidebar('ADMIN','tenders')}"></th:block>
+
+<div id="main">
+    <div class="topbar">
+        <h5>✏️ Update Tender</h5>
+        <div style="display:flex;align-items:center;gap:14px">
+            <div class="clock-badge">🕐 <span id="clock"></span></div>
+            <div class="admin-badge">👑 <span th:text="${adminName}">Admin</span></div>
+        </div>
+    </div>
+
+    <div class="page-body">
+        <div th:if="${success}" class="alert alert-success mb-4" th:text="${success}"></div>
+        <div th:if="${error}"   class="alert alert-danger  mb-4" th:text="${error}"></div>
+
+        <div class="form-card">
+            <div class="form-card-header">
+                <h5>✏️ Edit Tender Details</h5>
+                <p>Update the information for this tender</p>
+            </div>
+            <div class="form-card-body">
+                <form th:action="@{/admin/tender/save}"
+                      th:object="${tender}"
+                      method="post"><input type="hidden" name="_csrf" th:value="${_csrf}" />
+                    <input type="hidden" th:field="*{id}">
+
+                    <div class="section-divider">Basic Information</div>
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Tender Title *</label>
+                            <input type="text" th:field="*{title}" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Category *</label>
+                            <select th:field="*{category}" class="form-select" required>
+                                <option value="Infrastructure">🏗 Infrastructure</option>
+                                <option value="Technology">💻 Technology</option>
+                                <option value="Supply Chain">📦 Supply Chain</option>
+                                <option value="Healthcare">🏥 Healthcare</option>
+                                <option value="Education">🎓 Education</option>
+                                <option value="Other">📌 Other</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            <textarea th:field="*{description}" class="form-control" rows="4"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Estimated Budget (₹)</label>
+                            <input type="number" th:field="*{estimatedBudget}" class="form-control"
+                                   min="1" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="section-divider">Timeline</div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Start Date *</label>
+                            <input type="date" th:field="*{startDate}" class="form-control"
+                                   id="startDate" required onchange="validateDates()">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">End Date *</label>
+                            <input type="date" th:field="*{endDate}" class="form-control"
+                                   id="endDate" required onchange="validateDates()">
+                            <div class="form-text" id="dateMsg">Minimum 7 days duration required.</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-3 mt-4">
+                        <a th:href="@{/admin/tenders}" class="btn-cancel">Cancel</a>
+                        <button type="submit" class="btn-submit" id="submitBtn">💾 Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function updateClock() {
+        document.getElementById('clock').textContent =
+            new Date().toLocaleString('en-IN', {
+                day:'2-digit',month:'short',year:'numeric',
+                hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true
+            });
+    }
+    updateClock(); setInterval(updateClock, 1000);
+
+    function validateDates() {
+        const start = new Date(document.getElementById('startDate').value);
+        const end   = new Date(document.getElementById('endDate').value);
+        const msg   = document.getElementById('dateMsg');
+        const btn   = document.getElementById('submitBtn');
+        if (start && end) {
+            const diffDays = (end - start) / (1000 * 60 * 60 * 24);
+            if (diffDays < 7) {
+                msg.textContent = '❌ Must be at least 7 days apart.';
+                msg.style.color = '#e74a3b';
+                btn.disabled = true;
+            } else {
+                msg.textContent = '✅ ' + Math.round(diffDays) + ' days — Valid!';
+                msg.style.color = '#1cc88a';
+                btn.disabled = false;
+            }
+        }
+    }
+</script>
+
+<link rel="stylesheet" th:href="@{/css/chatbot.css}">
+<script th:src="@{/js/chatbot.js}"></script>
+</body>
+</html>

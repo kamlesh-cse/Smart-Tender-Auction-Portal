@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:fragment="sidebarStyles">
+    <style>
+        :root { --sidebar-w: 260px; --sidebar-accent: var(--primary, var(--accent, #4e73df)); }
+        #sidebar {
+            width: var(--sidebar-w) !important;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: #1a1c23;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .sidebar-brand {
+            padding: 22px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            text-align: center;
+        }
+        .sidebar-brand .logo { font-size: 1.5rem; }
+        .sidebar-brand h5 {
+            color: #fff;
+            font-weight: 800;
+            margin: 6px 0 2px;
+            font-size: 1rem;
+        }
+        .sidebar-brand small { color: rgba(255,255,255,0.45); font-size: 0.75rem; }
+        .sidebar-nav {
+            padding: 14px 0 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .sidebar-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .sidebar-group + .sidebar-group {
+            margin-top: 20px;
+        }
+        .sidebar-link {
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255,255,255,0.68);
+            text-decoration: none;
+            padding: 11px 20px;
+            font-size: 0.87rem;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+            transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            color: #fff;
+            background: rgba(255,255,255,0.07);
+            border-left-color: var(--sidebar-accent);
+        }
+        .sidebar-link:hover {
+            transform: translateX(2px);
+        }
+        .sidebar-link.disabled,
+        .sidebar-link[aria-disabled="true"] {
+            color: rgba(255,255,255,0.36);
+            cursor: not-allowed;
+            pointer-events: auto;
+        }
+        .sidebar-link.disabled:hover,
+        .sidebar-link[aria-disabled="true"]:hover {
+            color: rgba(255,255,255,0.42);
+            background: transparent;
+            border-left-color: transparent;
+            transform: none;
+        }
+        .sidebar-link .icon {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 16px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .logout-btn {
+            display: block;
+            text-align: center;
+            color: #e74a3b;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(231,74,59,0.1);
+        }
+        .logout-btn:hover { background: rgba(231,74,59,0.18); color: #fff; }
+        #main { margin-left: var(--sidebar-w) !important; }
+        @media (max-width: 768px) {
+            #sidebar { position: static; width: 100% !important; height: auto; }
+            #main { margin-left: 0 !important; }
+        }
+    </style>
+</th:block>
+
+<nav th:fragment="sidebar(role, active)" id="sidebar">
+    <div class="sidebar-brand">
+        <div class="logo">🏛️</div>
+        <h5 th:text="${role == 'ADMIN' ? 'Admin Panel' : role == 'GOVERNMENT' ? 'Government Panel' : role == 'COMPANY' ? 'Company Panel' : 'User Panel'}">Smart Portal</h5>
+        <small>Smart Tender &amp; Auction</small>
+    </div>
+
+    <div class="sidebar-nav" th:if="${role == 'ADMIN'}">
+        <div class="sidebar-group">
+            <a th:href="@{/admin/dashboard}" class="sidebar-link" th:classappend="${active == 'dashboard'} ? ' active'"><span class="icon">📊</span> Dashboard</a>
+        </div>
+        <div class="sidebar-group">
+            <a th:href="@{/admin/users}" class="sidebar-link" th:classappend="${active == 'users'} ? ' active'"><span class="icon">👥</span> Manage Users</a>
+        </div>
+        <div class="sidebar-group">
+            <a th:href="@{/admin/auctions}" class="sidebar-link" th:classappend="${active == 'auctions'} ? ' active'"><span class="icon">🔨</span> All Auctions</a>
+            <a th:href="@{/admin/auction/create}" class="sidebar-link" th:classappend="${active == 'auction-create'} ? ' active'"><span class="icon">➕</span> Create Auction</a>
+        </div>
+        <div class="sidebar-group">
+            <a th:href="@{/admin/tenders}" class="sidebar-link" th:classappend="${active == 'tenders'} ? ' active'"><span class="icon">📋</span> All Tenders</a>
+            <a th:href="@{/admin/tender/create}" class="sidebar-link" th:classappend="${active == 'tender-create'} ? ' active'"><span class="icon">➕</span> Create Tender</a>
+        </div>
+        <div class="sidebar-group">
+            <a th:href="@{/}" class="sidebar-link"><span class="icon">🌐</span> View Site</a>
+        </div>
+    </div>
+
+    <div class="sidebar-nav" th:if="${role == 'USER'}">
+        <div class="sidebar-group">
+            <a th:href="@{/user/dashboard}" class="sidebar-link" th:classappend="${active == 'dashboard'} ? ' active'"><span class="icon">📊</span> Dashboard</a>
+        </div>
+        <div class="sidebar-group">
+            <a th:href="@{/user/auctions}" class="sidebar-link" th:classappend="${active == 'auctions'} ? ' active'"><span class="icon">🔨</span> All Auctions</a>
+        </div>
+        <div class="sidebar-group">
+            <a th:href="@{/user/my-bids}" class="sidebar-link" th:classappend="${active == 'my-bids'} ? ' active'"><span class="icon">💰</span> My Bids &amp; Proposals</a>
+        </div>
+        <div class="sidebar-group">
+            <a th:href="@{/}" class="sidebar-link"><span class="icon">🌐</span> View Site</a>
+        </div>
+    </div>
+
+    <div class="sidebar-nav" th:if="${role == 'COMPANY'}">
+        <div class="sidebar-group">
+            <a th:href="@{/company/dashboard}" class="sidebar-link" th:classappend="${active == 'dashboard'} ? ' active'"><span class="icon">📊</span> Dashboard</a>
+        </div>
+        <div class="sidebar-group">
+            <a th:href="@{/company/auctions}" class="sidebar-link" th:classappend="${active == 'auctions'} ? ' active'"><span class="icon">🔨</span> All Auctions</a>
+            <a th:href="@{/company/my-auctions}" class="sidebar-link" th:classappend="${active == 'my-auctions'} ? ' active'"><span class="icon">📁</span> My Auctions</a>
+            <a th:href="@{/company/auction/create}" class="sidebar-link" th:classappend="${active == 'auction-create'} ? ' active'"><span class="icon">➕</span> Create Auction</a>
+        </div>
+        <div class="sidebar-group">
+            <a th:href="@{/company/tenders}" class="sidebar-link" th:classappend="${active == 'browse-tenders'} ? ' active'"><span class="icon">📋</span> Browse Tenders</a>
+            <a th:href="@{/company/my-tenders}" class="sidebar-link" th:classappend="${active == 'tenders'} ? ' active'"><span class="icon">📁</span> My Tenders</a>
+            <a th:href="@{/company/tender/create}" class="sidebar-link" th:classappend="${active == 'tender-create'} ? ' active'"><span class="icon">➕</span> Create Tender</a>
+        </div>
+        <div class="sidebar-group">
+            <a th:href="@{/company/my-bids}" class="sidebar-link" th:classappend="${active == 'my-bids'} ? ' active'"><span class="icon">💰</span> My Bids &amp; Proposals</a>
+        </div>
+        <div class="sidebar-group">
+            <a th:href="@{/}" class="sidebar-link"><span class="icon">🌐</span> View Site</a>
+        </div>
+    </div>
+
+    <div class="sidebar-nav" th:if="${role == 'GOVERNMENT'}">
+        <div class="sidebar-group">
+            <a th:href="@{/government/dashboard}" class="sidebar-link" th:classappend="${active == 'dashboard'} ? ' active'"><span class="icon">📊</span> Dashboard</a>
+        </div>
+        <div class="sidebar-group">
+            <a th:href="@{/government/auctions}" class="sidebar-link" th:classappend="${active == 'auctions'} ? ' active'"><span class="icon">🔨</span> My Auctions</a>
+            <a th:href="@{/government/auction/create}" class="sidebar-link" th:classappend="${active == 'auction-create'} ? ' active'"><span class="icon">➕</span> Create Auction</a>
+        </div>
+        <div class="sidebar-group">
+            <a th:href="@{/government/tenders}" class="sidebar-link" th:classappend="${active == 'tenders'} ? ' active'"><span class="icon">📋</span> My Tenders</a>
+            <a th:href="@{/government/tender/create}" class="sidebar-link" th:classappend="${active == 'tender-create'} ? ' active'"><span class="icon">➕</span> Create Tender</a>
+        </div>
+        <div class="sidebar-group">
+            <span class="sidebar-link disabled" aria-disabled="true" title="Government accounts cannot participate in bids or proposals"><span class="icon">💰</span> My Bids &amp; Proposals</span>
+        </div>
+        <div class="sidebar-group">
+            <a th:href="@{/}" class="sidebar-link"><span class="icon">🌐</span> View Site</a>
+        </div>
+    </div>
+
+    <div class="sidebar-footer">
+        <a th:href="@{/logout}" class="logout-btn">🚪 Logout</a>
+    </div>
+</nav>
+</body>
+</html>

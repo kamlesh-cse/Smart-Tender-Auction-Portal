@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Tender | Government</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --sidebar-w:260px; --primary:#2d6a4f; --green:#1cc88a; --yellow:#f6c23e; --red:#e74a3b; --dark:#1a1c23; --light:#f8f9fc; }
+        * { box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:var(--light); margin:0; }
+        #sidebar { width:var(--sidebar-w); height:100vh; position:fixed; top:0; left:0; background:var(--dark); z-index:100; display:flex; flex-direction:column; overflow-y:auto; }
+        .sidebar-brand { padding:22px 20px; border-bottom:1px solid rgba(255,255,255,0.06); text-align:center; }
+        .sidebar-brand .logo { font-size:1.5rem; }
+        .sidebar-brand h5 { color:#fff; font-weight:800; margin:6px 0 2px; font-size:1rem; }
+        .sidebar-brand small { color:rgba(255,255,255,0.4); font-size:0.75rem; }
+        .nav-section { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1rem; color:rgba(255,255,255,0.3); padding:18px 20px 6px; font-weight:600; }
+        .sidebar-link { display:flex; align-items:center; gap:10px; color:rgba(255,255,255,0.65); text-decoration:none; padding:11px 20px; font-size:0.87rem; font-weight:500; border-left:3px solid transparent; transition:all 0.2s; }
+        .sidebar-link:hover, .sidebar-link.active { color:#fff; background:rgba(255,255,255,0.06); border-left-color:var(--primary); }
+        .sidebar-link .icon { font-size:1rem; width:20px; text-align:center; }
+        .sidebar-footer { margin-top:auto; padding:16px; border-top:1px solid rgba(255,255,255,0.06); }
+        .logout-btn { display:block; text-align:center; background:rgba(231,74,59,0.15); color:#e74a3b; border:1px solid rgba(231,74,59,0.3); padding:9px; border-radius:8px; text-decoration:none; font-size:0.85rem; font-weight:600; }
+        .logout-btn:hover { background:rgba(231,74,59,0.25); color:#e74a3b; }
+        #main { margin-left:var(--sidebar-w); min-height:100vh; display:flex; flex-direction:column; }
+        .topbar { background:#fff; padding:0 30px; height:65px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 1px 0 #eee; position:sticky; top:0; z-index:50; }
+        .topbar h5 { font-weight:700; color:var(--dark); margin:0; }
+        .clock-badge { background:var(--light); border:1px solid #e8e8e8; border-radius:8px; padding:6px 12px; font-size:0.8rem; color:#555; font-weight:600; }
+        .gov-badge { background:linear-gradient(135deg,var(--primary),#1b4332); color:#fff; padding:6px 14px; border-radius:20px; font-size:0.8rem; font-weight:700; }
+        .page-body { padding:28px 30px; flex:1; }
+        .form-card { background:#fff; border-radius:14px; box-shadow:0 2px 16px rgba(0,0,0,0.07); overflow:hidden; max-width:780px; margin:0 auto; }
+        .form-card-header { background:linear-gradient(135deg,var(--primary),#1b4332); padding:22px 28px; }
+        .form-card-header h5 { color:#fff; font-weight:700; margin:0; font-size:1.05rem; }
+        .form-card-header p { color:rgba(255,255,255,0.75); margin:4px 0 0; font-size:0.83rem; }
+        .form-card-body { padding:28px; }
+        .form-label { font-size:0.85rem; font-weight:600; color:#4e5e7a; margin-bottom:5px; }
+        .form-control, .form-select { border:1.5px solid #e0e4ef; border-radius:8px; padding:10px 14px; font-size:0.9rem; transition:border-color 0.2s; }
+        .form-control:focus, .form-select:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(45,106,79,0.1); }
+        .btn-submit { background:linear-gradient(135deg,var(--primary),#1b4332); border:none; border-radius:8px; padding:11px 28px; font-weight:700; color:#fff; font-size:0.92rem; cursor:pointer; transition:opacity 0.2s; }
+        .btn-submit:hover { opacity:0.88; }
+        .btn-cancel { background:var(--light); border:1.5px solid #e0e4ef; border-radius:8px; padding:11px 22px; font-weight:600; color:#666; font-size:0.92rem; text-decoration:none; transition:all 0.2s; }
+        .section-divider { font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08rem; color:#bbb; margin:20px 0 14px; padding-bottom:8px; border-bottom:1px solid #f0f0f0; }
+        .info-box { background:#f0faf7; border:1px solid #b8e0d4; border-radius:8px; padding:12px 16px; font-size:0.82rem; color:#13a06e; margin-bottom:20px; }
+    </style>
+</head>
+<body>
+    <th:block th:replace="~{fragments/sidebar :: sidebarStyles}"></th:block>
+    <th:block th:replace="~{fragments/sidebar :: sidebar('GOVERNMENT','tender-create')}"></th:block>
+
+<div id="main">
+    <div class="topbar">
+        <h5>➕ Create New Tender</h5>
+        <div style="display:flex;align-items:center;gap:14px">
+            <div class="clock-badge">🕐 <span id="clock"></span></div>
+            <div class="gov-badge">🏛️ <span th:text="${govName}">Authority</span></div>
+        </div>
+    </div>
+
+    <div class="page-body">
+        <div th:if="${success}" class="alert alert-success mb-4" th:text="${success}"></div>
+        <div th:if="${error}"   class="alert alert-danger  mb-4" th:text="${error}"></div>
+
+        <div class="form-card">
+            <div class="form-card-header">
+                <h5>📋 New Tender Details</h5>
+                <p>Publish a new tender for companies to submit proposals</p>
+            </div>
+            <div class="form-card-body">
+                <div class="info-box">ℹ️ <strong>Rule:</strong> Tender duration must be at least 7 days. Winner = lowest bidder.</div>
+
+                <form th:action="@{/government/tender/save}" th:object="${tender}" method="post"><input type="hidden" name="_csrf" th:value="${_csrf}" />
+                    <div class="section-divider">Basic Information</div>
+                    <div class="row g-3">
+                        <div class="col-md-8"><label class="form-label">Tender Title *</label><input type="text" th:field="*{title}" class="form-control" placeholder="Enter tender title" required></div>
+                        <div class="col-md-4"><label class="form-label">Category *</label>
+                            <select th:field="*{category}" class="form-select" required>
+                                <option value="">-- Select --</option>
+                                <option value="Infrastructure">🏗 Infrastructure</option>
+                                <option value="Technology">💻 Technology</option>
+                                <option value="Supply Chain">📦 Supply Chain</option>
+                            </select>
+                        </div>
+                        <div class="col-12"><label class="form-label">Description</label><textarea th:field="*{description}" class="form-control" rows="4"></textarea></div>
+                        <div class="col-md-6"><label class="form-label">Estimated Budget (₹)</label><input type="number" th:field="*{estimatedBudget}" class="form-control" min="1" step="0.01"></div>
+                    </div>
+
+                    <div class="section-divider">Timeline</div>
+                    <div class="row g-3">
+                        <div class="col-md-6"><label class="form-label">Start Date *</label><input type="date" th:field="*{startDate}" class="form-control" id="startDate" required></div>
+                        <div class="col-md-6"><label class="form-label">End Date *</label><input type="date" th:field="*{endDate}" class="form-control" id="endDate" required></div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-3 mt-4">
+                        <a th:href="@{/government/tenders}" class="btn-cancel">Cancel</a>
+                        <button type="submit" class="btn-submit" id="submitBtn">📋 Publish Tender</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateClock() { document.getElementById('clock').textContent = new Date().toLocaleString('en-IN', { day:'2-digit',month:'short',year:'numeric', hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true }); }
+    updateClock(); setInterval(updateClock, 1000);
+    document.getElementById('startDate').min = new Date().toISOString().split('T')[0];
+</script>
+
+<link rel="stylesheet" th:href="@{/css/chatbot.css}">
+<script th:src="@{/js/chatbot.js}"></script>
+</body>
+</html>

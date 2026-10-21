@@ -1,0 +1,30 @@
+<div th:fragment="footer">
+    <footer>
+        <div class="container text-center py-4">
+            &copy; 2025 SmartPortal. All rights reserved.
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const options = {
+                weekday: 'short', year: 'numeric', month: 'short',
+                day: '2-digit', hour: '2-digit', minute: '2-digit',
+                second: '2-digit', hour12: true
+            };
+            const el = document.getElementById('liveClock');
+            if (el) {
+                el.textContent = now.toLocaleString('en-IN', options);
+            }
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
+<link rel="stylesheet" th:href="@{/css/chatbot.css}">
+    <script th:src="@{/js/chatbot.js}"></script>
+</div>
+</body>
+</html>

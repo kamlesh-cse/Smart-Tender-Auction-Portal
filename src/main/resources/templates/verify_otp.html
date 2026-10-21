@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP | Smart Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --dark: #1a1c23;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a1c23 0%, #2d3561 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-wrapper {
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .brand-header .logo {
+            font-size: 2.5rem;
+        }
+
+        .brand-header h2 {
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 8px 0 4px;
+        }
+
+        .brand-header p {
+            color: rgba(255, 255, 255, 0.55);
+            font-size: 0.87rem;
+        }
+
+        .auth-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 36px 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-card h4 {
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .auth-card .sub {
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #4e5e7a;
+            margin-bottom: 5px;
+        }
+
+        .alert {
+            border-radius: 8px;
+            font-size: 0.87rem;
+            padding: 10px 14px;
+        }
+
+        /* OTP input — large & centred */
+        .otp-input {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: 12px;
+            text-align: center;
+            border: 2px solid #e0e4ef;
+            border-radius: 12px;
+            padding: 14px 10px;
+            font-family: monospace;
+            color: #224abe;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+
+        .otp-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.15);
+            outline: none;
+        }
+
+        .otp-input::placeholder {
+            color: #ccc;
+            letter-spacing: 4px;
+            font-size: 1.2rem;
+        }
+
+        .btn-verify {
+            width: 100%;
+            background: linear-gradient(135deg, #4e73df, #224abe);
+            border: none;
+            border-radius: 8px;
+            padding: 13px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #fff;
+            margin-top: 8px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-verify:hover {
+            opacity: 0.9;
+        }
+
+        .link-row {
+            text-align: center;
+            font-size: 0.87rem;
+            color: #666;
+            margin-top: 18px;
+        }
+
+        .link-row a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .link-row a:hover {
+            text-decoration: underline;
+        }
+
+        /* Countdown timer */
+        .timer-row {
+            text-align: center;
+            font-size: 0.83rem;
+            color: #888;
+            margin-top: 10px;
+        }
+
+        .timer {
+            font-weight: 700;
+            color: #e74a3b;
+        }
+
+        .info-box {
+            background: #fffbea;
+            border: 1px solid #f6c23e;
+            border-radius: 10px;
+            padding: 13px 16px;
+            margin-bottom: 22px;
+            font-size: 0.84rem;
+            color: #856404;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-wrapper">
+        <div class="brand-header">
+            <div class="logo">📨</div>
+            <h2>Smart Portal</h2>
+            <p>Verify Your Identity</p>
+        </div>
+
+        <div class="auth-card">
+            <h4>Enter OTP</h4>
+            <p class="sub">We sent a 6-digit code to your email</p>
+
+            <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+            <div class="info-box">
+                ⏱️ Your OTP is valid for <strong>10 minutes</strong>. Check your inbox (and spam folder).
+            </div>
+
+            <form th:action="@{/verify-otp}" method="post" id="otpForm"><input type="hidden" name="_csrf" th:value="${_csrf}" />
+                <div class="mb-4">
+                    <label class="form-label">6-Digit OTP</label>
+                    <input type="text" name="otp" id="otpInput" class="otp-input" placeholder="······" maxlength="6"
+                        pattern="[0-9]{6}" inputmode="numeric" autocomplete="one-time-code" autofocus required>
+                </div>
+
+                <div class="timer-row">
+                    OTP expires in <span class="timer" id="countdown">10:00</span>
+                </div>
+
+                <button type="submit" class="btn-verify mt-3">✅ Verify OTP</button>
+            </form>
+
+            <div class="link-row">
+                Didn't receive it? <a th:href="@{/forgot-password}">Resend OTP</a><br>
+                <a th:href="@{/login}" style="margin-top:8px;display:inline-block;">← Back to Login</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ── Auto-advance: only allow digits & auto-submit when 6 entered ────────────
+        const otpInput = document.getElementById('otpInput');
+        otpInput.addEventListener('input', function () {
+            this.value = this.value.replace(/\D/g, '').slice(0, 6);
+            if (this.value.length === 6) {
+                document.getElementById('otpForm').submit();
+            }
+        });
+
+        // ── 10-minute countdown timer ────────────────────────────────────────────────
+        let seconds = 600;
+        const timerEl = document.getElementById('countdown');
+        const interval = setInterval(() => {
+            seconds--;
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            timerEl.textContent = m + ':' + String(s).padStart(2, '0');
+            if (seconds <= 60) timerEl.style.color = '#e74a3b';
+            if (seconds <= 0) {
+                clearInterval(interval);
+                timerEl.textContent = 'EXPIRED';
+                document.querySelector('.btn-verify').disabled = true;
+                document.querySelector('.btn-verify').textContent = '⏱️ OTP Expired — Resend';
+            }
+        }, 1000);
+    </script>
+
+<link rel="stylesheet" th:href="@{/css/chatbot.css}">
+<script th:src="@{/js/chatbot.js}"></script>
+</body>
+
+</html>
